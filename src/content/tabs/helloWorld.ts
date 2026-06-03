@@ -1,0 +1,140 @@
+import type { TabDefinition } from '../../types';
+import { figmaAssets } from '../figmaAssets';
+
+// 这里维护 hello world 页的拼贴配置。
+// 常改字段：
+// x / y: 贴纸距离画布左上角的位置
+// width / height: 贴纸宽高
+// rotate: 旋转角度，单位是度
+// zIndex: 图层顺序，越大越靠上
+// imageSrc: 素材路径，后续建议替换成 public/assets 里的本地路径
+// hoverEffect: hover 动效，breathe 是轻微放大，swing 是左右摆动
+// action: 点击行为，例如打开作品详情或打开微信弹窗
+export const helloWorldTab: TabDefinition = {
+  id: 'hello-world',
+  label: 'hello world',
+  themeClass: 'theme-lavender',
+  boardTextureSrc: figmaAssets.boardTexture,
+  items: [
+    // 左侧工牌，hover 时左右晃动
+    {
+      id: 'badge-left',
+      kind: 'photo',
+      imageSrc: '/public/assets/tiezhi/1-card.png',
+      x: -50,
+      y: 5,
+      width: 224,
+      height: 578,
+      rotate: -11,
+      zIndex: 2,
+      hoverEffect: 'swing',
+      className: 'floating-cutout',
+    },
+    // 左侧机票
+    {
+      id: 'profile-card',
+      kind: 'photo',
+      imageSrc: '/public/assets/tiezhi/1-ticket.png',
+      x: 120,
+      y: 33,
+      width: 279,
+      height: 373,
+      rotate:10,
+      zIndex: 1,
+      hoverEffect: 'breathe',
+      className: 'floating-cutout',
+    },
+    //浙大校徽
+    {
+      id: 'xiaohuiZJU',
+      kind: 'sticker',
+      imageSrc: '/public/assets/tiezhi/1-ZJU.png',
+      x: 250,
+      y: 400,
+      width: 100,
+      zIndex: 4,
+      rotate: -10,
+      hoverEffect: 'breathe',
+      className: 'floating-cutout',
+    },
+    // 微信贴纸，点击后打开二维码弹窗
+    {
+      id: 'wechat',
+      kind: 'sticker',
+      imageSrc: '/public/assets/tiezhi/1-wechat.png',
+      x: 251,
+      y: 670,
+      width: 72,
+      height: 72,
+      zIndex: 4,
+      rotate: -2,
+      hoverEffect: 'breathe',
+      action: { type: 'openWechat' },
+      className: 'floating-cutout',
+    },
+    // 我的名字
+    {
+      id:'myname' ,
+      kind:'sticker',
+      imageSrc: '/public/assets/tiezhi/1-name.png',
+      x: 403,
+      y: 280,
+      width: 300,
+      zIndex: 4,
+      rotate: 0,
+      className: 'floating-cutout',
+    },
+    // 中间的自我介绍文本
+    {
+      id: 'intro-note',
+      kind: 'note',
+      body: '2022年从浙大毕业，加入蚂蚁成为体验设计师，近4年的时间一致围绕金融业务做设计。\n\n2026年初我获得一个难得的机会回到家乡福州，体验了近半年更稳定的工作状态。但我发现自己还是更喜欢创造性的工作、靠近真实市场、产品变化和技术变化的环境。\n\n所以现在我重新开始看机会。希望有机会和你聊聊～',
+      x: 403,
+      y: 409,
+      width: 399,
+      height: 195,
+      hoverEffect: 'none',
+      className: 'plain-copy',
+    },
+    // 右上项目卡片
+    {
+      id: 'project-cover-1',
+      kind: 'photo',
+      imageSrc: '/public/assets/tiezhi/1-ux.png',
+      x: 742,
+      y: 45,
+      width: 500,
+      rotate: -5,
+      zIndex: 3,
+      hoverEffect: 'breathe',
+      className: 'floating-cutout text-hidden',
+    },
+    // 右下木板项目
+    {
+      id: 'project-cover-2',
+      kind: 'photo',
+      imageSrc: '/public/assets/tiezhi/1-photos.png',
+      x: 900,
+      y: 286,
+      width: 360,
+      rotate: 8,
+      zIndex: 2,
+      hoverEffect: 'breathe',
+      className: 'floating-cutout text-hidden',
+    },
+    // 左下终端风贴纸
+    {
+      id: 'terminal-card',
+      kind: 'photo',
+      imageSrc: '/public/assets/tiezhi/1-terminal.png',      
+      x: 36,
+      y: 520,
+      width: 289,
+      height: 178,
+      rotate: 5,
+      zIndex: 3,
+      hoverEffect: 'breathe',
+      className: 'floating-cutout',
+    },
+  ],
+};

@@ -1,0 +1,8 @@
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1024" fill="#F6ECDD"/>
+  <rect x="120" y="120" width="1200" height="784" rx="40" fill="#FFFDF9"/>
+  <rect x="188" y="188" width="1064" height="160" rx="28" fill="#C9D58A"/>
+  <rect x="188" y="392" width="1064" height="420" rx="28" fill="#F0EFEA"/>
+  <text x="188" y="290" fill="#2F2725" font-family="Arial, sans-serif" font-size="56" font-weight="700">Keynote 占位长图 02</text>
+  <text x="188" y="474" fill="#5C514B" font-family="Arial, sans-serif" font-size="30">如果某个作品特别长，建议切成多张图顺序展示，减少一次性加载压力。</text>
+</svg>
