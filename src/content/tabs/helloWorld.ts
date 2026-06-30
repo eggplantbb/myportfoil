@@ -7,7 +7,7 @@ import { figmaAssets } from '../figmaAssets';
 // width / height: 贴纸宽高
 // rotate: 旋转角度，单位是度
 // zIndex: 图层顺序，越大越靠上
-// imageSrc: 素材路径，后续建议替换成 public/assets 里的本地路径
+// imageSrc: 素材路径，使用 public 目录时这里写 /assets/... 即可
 // hoverEffect: hover 动效，breathe 是轻微放大，swing 是左右摆动
 // action: 点击行为，例如打开作品详情或打开微信弹窗
 export const helloWorldTab: TabDefinition = {
@@ -20,21 +20,21 @@ export const helloWorldTab: TabDefinition = {
     {
       id: 'badge-left',
       kind: 'photo',
-      imageSrc: '/public/assets/tiezhi/1-card.png',
+      imageSrc: '/assets/tiezhi/1-card.png',
       x: -50,
       y: 5,
       width: 224,
       height: 578,
       rotate: -11,
       zIndex: 2,
-      hoverEffect: 'swing',
-      className: 'floating-cutout',
+      hoverEffect: 'none',
+      className: 'floating-cutout drop-in-from-top always-swing',
     },
     // 左侧机票
     {
       id: 'profile-card',
       kind: 'photo',
-      imageSrc: '/public/assets/tiezhi/1-ticket.png',
+      imageSrc: '/assets/tiezhi/1-ticket.png',
       x: 120,
       y: 33,
       width: 279,
@@ -48,7 +48,7 @@ export const helloWorldTab: TabDefinition = {
     {
       id: 'xiaohuiZJU',
       kind: 'sticker',
-      imageSrc: '/public/assets/tiezhi/1-ZJU.png',
+      imageSrc: '/assets/tiezhi/1-ZJU.png',
       x: 250,
       y: 400,
       width: 100,
@@ -61,7 +61,7 @@ export const helloWorldTab: TabDefinition = {
     {
       id: 'wechat',
       kind: 'sticker',
-      imageSrc: '/public/assets/tiezhi/1-wechat.png',
+      imageSrc: '/assets/tiezhi/1-wechat.png',
       x: 251,
       y: 670,
       width: 72,
@@ -76,7 +76,7 @@ export const helloWorldTab: TabDefinition = {
     {
       id:'myname' ,
       kind:'sticker',
-      imageSrc: '/public/assets/tiezhi/1-name.png',
+      imageSrc: '/assets/tiezhi/1-name.png',
       x: 403,
       y: 280,
       width: 300,
@@ -100,7 +100,7 @@ export const helloWorldTab: TabDefinition = {
     {
       id: 'project-cover-1',
       kind: 'photo',
-      imageSrc: '/public/assets/tiezhi/1-ux.png',
+      imageSrc: '/assets/tiezhi/1-ux.png',
       x: 742,
       y: 45,
       width: 500,
@@ -113,7 +113,7 @@ export const helloWorldTab: TabDefinition = {
     {
       id: 'project-cover-2',
       kind: 'photo',
-      imageSrc: '/public/assets/tiezhi/1-photos.png',
+      imageSrc: '/assets/tiezhi/1-photos.png',
       x: 900,
       y: 286,
       width: 360,
@@ -126,7 +126,7 @@ export const helloWorldTab: TabDefinition = {
     {
       id: 'terminal-card',
       kind: 'photo',
-      imageSrc: '/public/assets/tiezhi/1-terminal.png',      
+      imageSrc: '/assets/tiezhi/1-terminal.png',
       x: 36,
       y: 520,
       width: 289,

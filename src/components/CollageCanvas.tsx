@@ -3,7 +3,7 @@ import type { CollageItemData, TabDefinition } from '../types';
 
 type CollageCanvasProps = {
   tab: TabDefinition;
-  onItemClick: (item: CollageItemData) => void;
+  onItemClick: (item: CollageItemData, rect: DOMRect | null) => void;
 };
 
 export function CollageCanvas({ tab, onItemClick }: CollageCanvasProps) {

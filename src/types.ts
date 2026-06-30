@@ -41,7 +41,12 @@ export type ProjectHtmlDetail = {
   src: string;
 };
 
-export type ProjectDetail = ProjectImageDetail | ProjectHtmlDetail;
+export type ProjectVideoDetail = {
+  type: 'video';
+  src: string;
+};
+
+export type ProjectDetail = ProjectImageDetail | ProjectHtmlDetail | ProjectVideoDetail;
 
 export type ProjectDefinition = {
   id: string;

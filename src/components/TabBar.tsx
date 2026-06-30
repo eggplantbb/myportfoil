@@ -6,6 +6,10 @@ type TabBarProps = {
   onChange: (tabId: string) => void;
 };
 
+function hasChinese(text: string) {
+  return /[\u4e00-\u9fff]/.test(text);
+}
+
 function TabShape({ active, color }: { active: boolean; color: string }) {
   const width = active ? 320 : 150;
   const height = active ? 63 : 42;
@@ -48,7 +52,9 @@ export function TabBar({ tabs, activeTabId, onChange }: TabBarProps) {
             onClick={() => onChange(tab.id)}
           >
             <TabShape active={isActive} color={fillColor} />
-            <span className="tab-label">{tab.label}</span>
+            <span className={`tab-label ${hasChinese(tab.label) ? 'tab-label-cjk' : ''}`}>
+              {tab.label}
+            </span>
           </button>
         );
       })}

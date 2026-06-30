@@ -3,7 +3,7 @@ import type { CollageItemData } from '../types';
 
 type CollageItemProps = {
   item: CollageItemData;
-  onClick: (item: CollageItemData) => void;
+  onClick: (item: CollageItemData, rect: DOMRect | null) => void;
 };
 
 export function CollageItem({ item, onClick }: CollageItemProps) {
@@ -32,7 +32,7 @@ export function CollageItem({ item, onClick }: CollageItemProps) {
       type="button"
       className={classes}
       style={style}
-      onClick={() => onClick(item)}
+      onClick={(event) => onClick(item, event.currentTarget.getBoundingClientRect())}
       aria-disabled={!isInteractive}
     >
       {item.imageSrc ? (
