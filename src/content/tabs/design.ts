@@ -1,17 +1,14 @@
 import type { TabDefinition } from '../../types';
-import { figmaAssets } from '../figmaAssets';
 
 // 这里维护 一些设计 页的拼贴配置。
 export const designTab: TabDefinition = {
   id: 'design',
   label: '一些设计',
   themeClass: 'theme-olive',
-  boardTextureSrc: figmaAssets.boardTexture,
   items: [
     // 回款宝介绍
     {
       id: 'huikuanbao-card',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-hkb.png',
       x: 210,
       y: 33,
@@ -26,7 +23,6 @@ export const designTab: TabDefinition = {
     // 回款宝老板贴图
     {
       id: 'huikuanbao-boss',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-boss.png',
       x: 520,
       y: 10,
@@ -39,7 +35,6 @@ export const designTab: TabDefinition = {
     // 回款宝财务
     {
       id: 'huikuanbao-caiwu',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-caiwu.png',
       x: 0,
       y: 40,
@@ -52,7 +47,6 @@ export const designTab: TabDefinition = {
     // 回款宝发票贴图
     {
       id: 'huikuanbao-bill',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-bill.png',
       x: 170,
       y: 300,
@@ -65,7 +59,6 @@ export const designTab: TabDefinition = {
     // 他行转入卡片
     {
       id: 'thzr-card',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-zr.png',
       x: 20,
       y: 500,
@@ -79,7 +72,6 @@ export const designTab: TabDefinition = {
     // 他行转入配图
     {
       id: 'thzr-photo',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-heiban.png',
       x: 420,
       y: 500,
@@ -92,7 +84,6 @@ export const designTab: TabDefinition = {
     // 门店装修卡片
     {
       id: 'mdzx-card',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-mdzx.png',
       x: 800,
       y: 10,
@@ -106,7 +97,6 @@ export const designTab: TabDefinition = {
     // 宜家
     {
       id: 'yijia',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-IKEA.png',
       x: 1080,
       y: 100,
@@ -119,7 +109,6 @@ export const designTab: TabDefinition = {
     // 点评截图
     {
       id: 'dianping',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-dianping.png',
       x: 1140,
       y: 160,
@@ -132,7 +121,6 @@ export const designTab: TabDefinition = {
     // 农村金融调研
     {
       id: 'nc-card',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-nc.png',
       x: 750,
       y: 350,
@@ -146,7 +134,6 @@ export const designTab: TabDefinition = {
     //种柑橘
     {
       id: 'nc-ganju',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-nongcun.png',
       x: 1080,
       y: 550,
@@ -159,7 +146,6 @@ export const designTab: TabDefinition = {
     // 老头
     {
       id: 'nc-laotou',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-laotou.png',
       x: 1050,
       y: 480,
@@ -172,7 +158,6 @@ export const designTab: TabDefinition = {
     // 辣椒
     {
       id: 'nc-lajiao',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/2-lajiao.png',
       x: 700,
       y: 700,

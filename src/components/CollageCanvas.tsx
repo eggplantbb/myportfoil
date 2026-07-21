@@ -9,7 +9,7 @@ type CollageCanvasProps = {
 export function CollageCanvas({ tab, onItemClick }: CollageCanvasProps) {
   return (
     <section className={`canvas-shell ${tab.themeClass}`} aria-label={tab.label}>
-      <div className="canvas-grid" />
+      <div className="canvas-grid" aria-hidden="true" />
       <div className="canvas-items">
         {tab.items.map((item) => (
           <CollageItem key={item.id} item={item} onClick={onItemClick} />

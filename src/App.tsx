@@ -1,31 +1,58 @@
 import { useState } from 'react';
 import { CollageCanvas } from './components/CollageCanvas';
+import { EnvelopeIntro } from './components/EnvelopeIntro';
 import { ImmersiveProjectView } from './components/ImmersiveProjectView';
+import { ShowcaseModal } from './components/ShowcaseModal';
 import { TabBar } from './components/TabBar';
-import { WechatModal } from './components/WechatModal';
+import { productModalContent } from './content/productModals';
 import { projectMap } from './content/projects';
 import { tabs } from './content/tabs';
-import type { CollageItemData } from './types';
+import type { CollageItemData, ProductModalId } from './types';
+
+type ActiveModal = { type: 'wechat' } | { type: 'product'; id: ProductModalId } | null;
 
 export default function App() {
   const [activeTabId, setActiveTabId] = useState(tabs[0].id);
+  const [introComplete, setIntroComplete] = useState(false);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [detailTransitionOrigin, setDetailTransitionOrigin] = useState<{ x: number; y: number } | null>(null);
   const [detailClosing, setDetailClosing] = useState(false);
-  const [wechatOpen, setWechatOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
+  const [modalCenterX, setModalCenterX] = useState<number | null>(null);
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
   const activeProject = activeProjectId ? projectMap.get(activeProjectId) ?? null : null;
+  const activeProductModal = activeModal?.type === 'product' ? productModalContent[activeModal.id] : null;
+
+  const getBookletCenterX = () => {
+    const tabBar = document.querySelector('.tab-bar')?.getBoundingClientRect();
+    const canvas = document.querySelector('.canvas-shell')?.getBoundingClientRect();
+
+    if (!tabBar && !canvas) {
+      return null;
+    }
+
+    const left = Math.min(tabBar?.left ?? Number.POSITIVE_INFINITY, canvas?.left ?? Number.POSITIVE_INFINITY);
+    const right = Math.max(tabBar?.right ?? Number.NEGATIVE_INFINITY, canvas?.right ?? Number.NEGATIVE_INFINITY);
+    return (left + right) / 2;
+  };
 
   const handleItemClick = (item: CollageItemData, rect: DOMRect | null) => {
     const action = item.action;
 
-    if (!action || action.type === 'none') {
+    if (!action) {
       return;
     }
 
     if (action.type === 'openWechat') {
-      setWechatOpen(true);
+      setModalCenterX(getBookletCenterX());
+      setActiveModal({ type: 'wechat' });
+      return;
+    }
+
+    if (action.type === 'openModal') {
+      setModalCenterX(getBookletCenterX());
+      setActiveModal({ type: 'product', id: action.id });
       return;
     }
 
@@ -58,27 +85,54 @@ export default function App() {
     setDetailClosing(false);
   };
 
+  const closeModal = () => {
+    setActiveModal(null);
+    setModalCenterX(null);
+  };
+
   return (
-    <div className={`app-shell ${activeProject ? 'is-detail-mode' : ''}`}>
-      {activeProject ? (
+    <div className={`app-shell ${activeProject ? 'is-detail-mode' : ''} ${introComplete ? '' : 'is-cover-mode'}`}>
+      {introComplete && activeProject ? (
         <ImmersiveProjectView
           project={activeProject}
           onClose={handleDetailClose}
           transitionOrigin={detailTransitionOrigin}
           isClosing={detailClosing}
         />
-      ) : (
+      ) : introComplete ? (
         <>
-          <TabBar tabs={tabs} activeTabId={activeTabId} onChange={setActiveTabId} />
+          <div className="booklet-header">
+            <TabBar tabs={tabs} activeTabId={activeTabId} onChange={setActiveTabId} />
+            <img className="booklet-credit" src="/assets/footer-made-by.png" alt="made by ChatGPT x Figma" />
+          </div>
           <main className="main-stage">
             <CollageCanvas key={activeTab.id} tab={activeTab} onItemClick={handleItemClick} />
           </main>
-          <footer className="site-footer">
-            <img src="/assets/footer-made-by.png" alt="made by ChatGPT x Figma" />
-          </footer>
         </>
+      ) : (
+        <EnvelopeIntro onComplete={() => setIntroComplete(true)} />
       )}
-      <WechatModal open={wechatOpen} onClose={() => setWechatOpen(false)} />
+      {introComplete && activeModal?.type === 'wechat' ? (
+        <ShowcaseModal
+          title="微信二维码"
+          variant="qr"
+          imageSrc="/assets/tiezhi/wechat.JPG"
+          centerX={modalCenterX}
+          onClose={closeModal}
+        />
+      ) : null}
+      {introComplete && activeModal?.type === 'product' && activeProductModal ? (
+        <ShowcaseModal
+          variant="product"
+          title={activeProductModal.title}
+          body={activeProductModal.body}
+          imageSrc={activeProductModal.imageSrc}
+          linkText={activeProductModal.linkText}
+          linkHref={activeProductModal.linkHref}
+          centerX={modalCenterX}
+          onClose={closeModal}
+        />
+      ) : null}
     </div>
   );
 }

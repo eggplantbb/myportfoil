@@ -40,15 +40,6 @@ export function ImmersiveProjectView({
               <img key={image} src={image} alt={project.title} className="project-detail-image" />
             ))}
           </div>
-        ) : project.detail.type === 'video' ? (
-          <div className="project-video-stack">
-            <h1 className="project-video-title">{project.title}</h1>
-            <p className="project-video-summary">{project.summary}</p>
-            <video className="project-detail-video" controls playsInline preload="metadata">
-              <source src={project.detail.src} type="video/mp4" />
-              你的浏览器暂不支持视频播放。
-            </video>
-          </div>
         ) : (
           <iframe
             className="project-html-frame"

@@ -1,16 +1,13 @@
 import type { TabDefinition } from '../../types';
-import { figmaAssets } from '../figmaAssets';
 
 // 这里维护 看看世界 页的拼贴配置。
 export const travelTab: TabDefinition = {
   id: 'travel',
   label: '看看世界',
   themeClass: 'theme-blue',
-  boardTextureSrc: figmaAssets.boardTexture,
   items: [
     {
       id: '5-1',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-1.png',
       x: 34,
       y: 60,
@@ -22,7 +19,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-2',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-2.png',
       x: 280,
       y: 30,
@@ -33,7 +29,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-3',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-3.png',
       x: 1000,
       y: 550,
@@ -44,7 +39,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-4',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-4.png',
       x: 820,
       y: 28,
@@ -56,7 +50,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-5',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-5.png',
       x: 1060,
       y: 60,
@@ -67,7 +60,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-8',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-8.png',
       x: 426,
       y: 298,
@@ -79,7 +71,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-9',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-9.png',
       x: 530,
       y: 44,
@@ -91,7 +82,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-11',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-11.png',
       x: 990,
       y: 360,
@@ -102,7 +92,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-12',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-12.png',
       x: 80,
       y: 310,
@@ -113,7 +102,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-13',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-13.png',
       x: 124,
       y: 530,
@@ -125,7 +113,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-14',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-14.png',
       x: 450,
       y: 580,
@@ -137,7 +124,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-15',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-15.png',
       x: 660,
       y: 330,
@@ -149,7 +135,6 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-16',
-      kind: 'photo',
       imageSrc: '/assets/tiezhi/5-16.png',
       x: 730,
       y: 600,

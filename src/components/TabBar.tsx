@@ -6,6 +6,13 @@ type TabBarProps = {
   onChange: (tabId: string) => void;
 };
 
+const tabColors: Record<string, string> = {
+  'theme-lavender': '#b9a7ff',
+  'theme-olive': '#c4cf6f',
+  'theme-pink': '#f29bd4',
+  'theme-blue': '#b8cff8',
+};
+
 function hasChinese(text: string) {
   return /[\u4e00-\u9fff]/.test(text);
 }
@@ -35,14 +42,7 @@ export function TabBar({ tabs, activeTabId, onChange }: TabBarProps) {
     <nav className="tab-bar" aria-label="栏目切换">
       {tabs.map((tab) => {
         const isActive = tab.id === activeTabId;
-        const colorMap: Record<string, string> = {
-          'theme-lavender': '#b9a7ff',
-          'theme-olive': '#c4cf6f',
-          'theme-pink': '#f29bd4',
-          'theme-yellow': '#f6d57c',
-          'theme-blue': '#b8cff8',
-        };
-        const fillColor = colorMap[tab.themeClass] ?? '#b9a7ff';
+        const fillColor = tabColors[tab.themeClass] ?? '#b9a7ff';
 
         return (
           <button

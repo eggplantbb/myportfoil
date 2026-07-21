@@ -3,7 +3,6 @@ import type { ProjectDefinition } from '../../types';
 export const nongcunProject: ProjectDefinition = {
   id: 'nongcun',
   title: '农村金融调研',
-  summary: '这里先接图片型详情内容，后续可继续替换或补充。',
   detail: {
     type: 'image',
     images: [
