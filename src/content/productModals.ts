@@ -34,8 +34,8 @@ export const productModalContent: Record<ProductModalId, ProductModalContent> = 
     title: '武林舆图',
     body: '有一天我才意识到倚天里的明教竟然在西藏，才体会围攻光明顶的难度。所以做了一个金庸武侠世界里的门派分布图和关系图。能把各门各派的链接、位置看的一清二楚。',
     imageSrc: '/assets/tiezhi/jinyong.png',
-    linkText: '已开源：https://github.com/eggplantbb/jinyong',
-    linkHref: 'https://github.com/eggplantbb/jinyong',
+    linkText: '已开源：https://github.com/eggplantbb/wuxaiditu',
+    linkHref: 'https://github.com/eggplantbb/wuxaiditu',
   },
   write: {
     title: '随便写写',
