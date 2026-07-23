@@ -5,6 +5,6 @@ export const bankProject: ProjectDefinition = {
   title: 'bank',
   detail: {
     type: 'html',
-    src: '/project-html/bank/index.html',
+    src: '/project-html/AIBank/prototype/index.html',
   },
 };

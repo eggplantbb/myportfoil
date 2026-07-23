@@ -54,27 +54,31 @@ export function ShowcaseModal({
         onClick={(event) => event.stopPropagation()}
       >
         <button type="button" className="showcase-modal-close" onClick={onClose} aria-label="关闭弹窗">
-          X
+          <img src="/assets/close.png" alt="" aria-hidden="true" />
         </button>
         <div className="showcase-modal-body">
           {variant === 'product' ? (
             <div className="product-modal-content">
-              {imageSrc ? (
-                <img className="product-modal-image" src={imageSrc} alt={title} />
-              ) : (
-                <div className="product-modal-image-placeholder" aria-hidden="true">
-                  <span>图片占位</span>
-                </div>
-              )}
+              <div className="product-modal-media">
+                {imageSrc ? (
+                  <img className="product-modal-image" src={imageSrc} alt={title} />
+                ) : (
+                  <div className="product-modal-image-placeholder" aria-hidden="true">
+                    <span>图片占位</span>
+                  </div>
+                )}
+              </div>
               <h2>{title}</h2>
               <p>{body}</p>
-              {linkText && linkHref ? (
-                <a className="product-modal-link" href={linkHref} target="_blank" rel="noreferrer">
-                  {linkText}
-                </a>
-              ) : linkText ? (
-                <span className="product-modal-note">{linkText}</span>
-              ) : null}
+              <div className="product-modal-link-slot">
+                {linkText && linkHref ? (
+                  <a className="product-modal-link" href={linkHref} target="_blank" rel="noreferrer">
+                    {linkText}
+                  </a>
+                ) : linkText ? (
+                  <span className="product-modal-note">{linkText}</span>
+                ) : null}
+              </div>
             </div>
           ) : (
             <>

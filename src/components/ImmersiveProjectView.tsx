@@ -15,7 +15,7 @@ export function ImmersiveProjectView({
 }: ImmersiveProjectViewProps) {
   return (
     <section
-      className={`immersive-project-view ${transitionOrigin ? 'immersive-project-view-animated' : ''} ${isClosing ? 'is-closing' : ''}`}
+      className={`immersive-project-view project-${project.id} ${transitionOrigin ? 'immersive-project-view-animated' : ''} ${isClosing ? 'is-closing' : ''}`}
       aria-label={project.title}
       style={
         transitionOrigin
@@ -45,6 +45,7 @@ export function ImmersiveProjectView({
             className="project-html-frame"
             src={project.detail.src}
             title={project.title}
+            allowTransparency
           />
         )}
       </div>

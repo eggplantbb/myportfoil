@@ -10,6 +10,9 @@ type IntroState = 'closed' | 'opening' | 'revealed' | 'entering';
 const BASE_TILT = 0;
 const OPEN_DURATION = 620;
 const ENTER_DURATION = 520;
+const AUTO_ADVANCE_DELAY = 5000;
+const AUTO_ENTER_LIFT = -180;
+const AUTO_ENTER_DRAG_DURATION = 420;
 const ENTER_THRESHOLD = -120;
 
 export function EnvelopeIntro({ onComplete }: EnvelopeIntroProps) {
@@ -21,15 +24,36 @@ export function EnvelopeIntro({ onComplete }: EnvelopeIntroProps) {
   const pointerStart = useRef<{ x: number; y: number; lift: number } | null>(null);
   const liftRef = useRef(0);
   const transitionTimer = useRef<number | null>(null);
+  const autoAdvanceTimer = useRef<number | null>(null);
+
+  const clearTimer = (timer: { current: number | null }) => {
+    if (timer.current !== null) {
+      window.clearTimeout(timer.current);
+      timer.current = null;
+    }
+  };
 
   useEffect(
     () => () => {
-      if (transitionTimer.current !== null) {
-        window.clearTimeout(transitionTimer.current);
-      }
+      clearTimer(transitionTimer);
+      clearTimer(autoAdvanceTimer);
     },
     [],
   );
+
+  useEffect(() => {
+    clearTimer(autoAdvanceTimer);
+
+    if (state === 'closed') {
+      autoAdvanceTimer.current = window.setTimeout(openEnvelope, AUTO_ADVANCE_DELAY);
+    }
+
+    if (state === 'revealed') {
+      autoAdvanceTimer.current = window.setTimeout(startAutoEnter, AUTO_ADVANCE_DELAY);
+    }
+
+    return () => clearTimer(autoAdvanceTimer);
+  }, [state]);
 
   const resetDrag = () => {
     liftRef.current = 0;
@@ -43,8 +67,10 @@ export function EnvelopeIntro({ onComplete }: EnvelopeIntroProps) {
       return;
     }
 
+    clearTimer(autoAdvanceTimer);
     resetDrag();
     setState('opening');
+    clearTimer(transitionTimer);
     transitionTimer.current = window.setTimeout(() => setState('revealed'), OPEN_DURATION);
   };
 
@@ -54,10 +80,26 @@ export function EnvelopeIntro({ onComplete }: EnvelopeIntroProps) {
     }
 
     setState('entering');
+    clearTimer(transitionTimer);
     transitionTimer.current = window.setTimeout(onComplete, ENTER_DURATION);
   };
 
+  const startAutoEnter = () => {
+    if (state !== 'revealed') {
+      return;
+    }
+
+    clearTimer(autoAdvanceTimer);
+    liftRef.current = AUTO_ENTER_LIFT;
+    setLift(AUTO_ENTER_LIFT);
+    setOffsetX(0);
+    setTilt(BASE_TILT);
+    clearTimer(transitionTimer);
+    transitionTimer.current = window.setTimeout(enterHomepage, AUTO_ENTER_DRAG_DURATION);
+  };
+
   const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
+    clearTimer(autoAdvanceTimer);
     pointerStart.current = { x: event.clientX, y: event.clientY, lift };
     setIsDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);

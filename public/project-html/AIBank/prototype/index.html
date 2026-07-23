@@ -1,0 +1,4493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>资金地图 - 原型</title>
+<style>
+@font-face {
+  font-family: "AlibabaSansNumber";
+  src: url("../AlibabaSans102Ver2-Bd.otf") format("opentype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0030-0039;
+}
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --primary: #1677FF;
+  --primary-light: #E6F2FF;
+  --primary-pale: #F5F9FF;
+  --bg: #F5F6FA;
+  --surface: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --text-inverse: #FFFFFF;
+  --border: #EBEDF0;
+  --border-light: #F3F4F6;
+  --success: #22C55E;
+  --success-bg: #F0FDF4;
+  --warning: #F59E0B;
+  --warning-bg: #FFF7ED;
+  --danger: #EF4444;
+  --danger-bg: #FEF2F2;
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 12px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-base: 14px;
+  --font-lg: 15px;
+  --font-xl: 16px;
+  --font-2xl: 18px;
+  --font-3xl: 20px;
+  --font-4xl: 24px;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --line-height: 1.5;
+  --transition: 150ms ease;
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  font-family: "AlibabaSansNumber", -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: var(--font-base);
+  font-weight: var(--weight-normal);
+  line-height: var(--line-height);
+  color: var(--text-primary);
+  background: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-width: 1086px;
+  padding: 0;
+  overflow: auto;
+}
+
+/* ===== PHONE FRAME ===== */
+.phone-frame {
+  width: 375px;
+  height: 100%;
+  background: #F0F6FF;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 0;
+  scrollbar-width: none;
+}
+.phone-frame::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: url('../background.png') no-repeat center top;
+  background-size: cover;
+  pointer-events: none;
+}
+.phone-frame::-webkit-scrollbar { display: none; }
+
+/* ===== TOP NAVBAR ===== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border);
+  padding: 0 var(--space-lg);
+}
+
+.navbar-status {
+  height: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: var(--space-sm);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.navbar-main {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-back {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+}
+.nav-back:active { background: var(--border-light); }
+
+.nav-title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot.green { background: var(--success); }
+.status-dot.blue  { background: var(--primary); }
+.status-dot.orange { background: var(--warning); }
+
+.nav-title {
+  font-size: var(--font-xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.nav-updated {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-top: 1px;
+  cursor: pointer;
+}
+
+.nav-more {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+}
+.nav-more:active { background: var(--border-light); }
+
+/* ===== PAGE CONTENT ===== */
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 64px var(--space-lg) 96px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-height: 100%;
+}
+
+/* story-nav sits sticky under the navbar; let it own its slot */
+.story-nav {
+  margin: 0 0 var(--space-md);
+}
+
+.bottom-bar {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  z-index: 150;
+  display: block;
+  pointer-events: none;
+  background: var(--surface);
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.card-title {
+  font-size: var(--font-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.card-subtitle {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ===== WEEK SUMMARY ===== */
+.week-summary {
+  position: relative;
+  background: radial-gradient(circle at 50% 42%, #E9F1FF 0%, #FFFFFF 54%, #FFFFFF 100%);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.week-summary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, #74D5FF 0%, #75ABFF 35%, #63A4FF 68%, #BBABFF 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.week-summary-visual {
+  display: block;
+  width: 88px;
+  height: auto;
+  margin: 0 0 12px 0;
+}
+
+.role-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 42px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  margin: 0;
+  max-width: none;
+}
+
+.role-option {
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  padding: 0 0 6px;
+  font-family: inherit;
+  font-size: var(--font-base);
+  color: #666666;
+  cursor: pointer;
+  position: relative;
+}
+
+.role-option.active {
+  background: transparent;
+  color: var(--primary);
+  font-weight: var(--weight-semibold);
+}
+
+.role-option.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.role-switch-label {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #999999;
+}
+
+.stage-phone .role-switch {
+  position: absolute;
+  left: 19px;
+  top: 956px;
+  width: 375px;
+  max-width: 375px;
+  margin: 0;
+  z-index: 540;
+}
+
+.week-summary-text {
+  min-height: calc(var(--font-sm) * 1.65 * 3);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-normal);
+  color: #333333;
+  line-height: 1.65;
+}
+
+.week-summary-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  background: #333333;
+  vertical-align: -0.12em;
+  animation: summaryCursorBlink 900ms steps(1) infinite;
+}
+
+@keyframes summaryCursorBlink {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
+}
+
+/* ===== BRIEFING CARD ===== */
+.briefing-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 0.5px solid var(--border);
+  border-left: 3px solid var(--primary);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.briefing-card:active { opacity: 0.7; }
+.briefing-card.alert { border-left-color: var(--warning); }
+
+.briefing-main {
+  font-size: var(--font-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.briefing-sub {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.briefing-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  font-size: var(--font-sm);
+  color: var(--primary);
+  margin-top: var(--space-sm);
+  font-weight: var(--weight-medium);
+}
+
+.briefing-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: var(--primary-light);
+  border-radius: 4px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* ===== MAP CARD ===== */
+.map-tabs {
+  position: relative;
+  display: flex;
+  margin: calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg)) 16px;
+  background: url('../tab.png') no-repeat center center;
+  background-size: 100% 100%;
+  border-radius: var(--radius) var(--radius) 0 0;
+  overflow: hidden;
+}
+.map-tabs::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  background: url('../lefttab.png') no-repeat center center;
+  background-size: 100% 100%;
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+  z-index: 0;
+}
+.map-tabs.show-left::before { opacity: 1; }
+.map-tabs::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+  background: url('../righttab.png') no-repeat center center;
+  background-size: 100% 100%;
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+  z-index: 0;
+}
+.map-tabs.show-right::after { opacity: 1; }
+
+.map-tab {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  font-weight: var(--weight-normal);
+  color: #999999;
+  cursor: pointer;
+  transition: color var(--transition);
+  padding: 10px 0;
+}
+.map-tab span {
+  position: relative;
+  display: inline-block;
+}
+.map-tab.active span::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #B1D1FF, #FFFFFF);
+  margin-top: 0;
+}
+.map-tab.active {
+  color: #333333;
+  font-weight: var(--weight-semibold);
+}
+
+.map-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: var(--font-xs);
+  font-weight: var(--weight-medium);
+}
+.map-tag.green  { background: var(--success-bg); color: var(--success); }
+.map-tag.blue   { background: var(--primary-light); color: var(--primary); }
+.map-tag.orange { background: var(--warning-bg); color: #D97706; }
+.map-tag.red    { background: var(--danger-bg); color: var(--danger); }
+
+/* View toggling */
+.flow-view { display: block; }
+.balance-view { display: none; }
+
+/* ===== FUND FLOW (资金流向·三列+连接线) ===== */
+.flow-grid {
+  display: grid;
+  grid-template-columns: 1fr 22px 74px 22px 1fr;
+  align-items: stretch;
+  gap: 0;
+}
+
+.flow-col-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: var(--font-xs);
+  color: #333333;
+  font-weight: var(--weight-medium);
+  margin-bottom: 5px;
+}
+.flow-col-title .arrow-up { color: var(--text-tertiary); }
+.flow-col-title .arrow-dn { color: var(--text-tertiary); }
+
+.flow-col-total {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 5px;
+  white-space: nowrap;
+}
+
+.flow-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.flow-side {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* 每个项目：标题在上，数字在下 */
+.flow-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm);
+  flex: 1;
+  justify-content: center;
+  background: var(--border-light);
+}
+.flow-card .fc-name {
+  font-size: 9px;
+  color: #333333;
+  white-space: nowrap;
+}
+.flow-card .fc-amt {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: var(--font-sm);
+  font-weight: var(--weight-normal);
+  color: #666666;
+  white-space: nowrap;
+}
+
+/* 连接线列 */
+.flow-link {
+  align-self: stretch;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.flow-link svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+/* 中间金额列 */
+.flow-pool-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flow-pool-box {
+  width: 100%;
+  flex: 1;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--primary-light) 0%, var(--primary-pale) 100%);
+  border: 1px solid var(--primary-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 4px;
+  min-height: 0;
+}
+.flow-pool-label {
+  font-size: var(--font-xs);
+  color: #333333;
+  font-weight: var(--weight-medium);
+}
+.flow-pool-amt {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--primary);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.flow-pool-sub {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: 1.3;
+}
+.flow-pool-net {
+  font-size: 9px;
+  font-weight: var(--weight-semibold);
+  color: var(--danger);
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* ===== BALANCE CURVE (本周余额曲线) ===== */
+.balance-curve {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+.balance-curve-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+.balance-curve-title {
+  font-size: var(--font-lg);
+  font-weight: var(--weight-semibold);
+}
+.balance-curve-sub {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+.balance-curve-svg {
+  width: 100%;
+  height: 130px;
+  display: block;
+  overflow: visible;
+}
+.bc-axis-label {
+  font-size: 9px;
+  fill: var(--text-tertiary);
+}
+.bc-safety {
+  stroke: var(--warning);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.bc-safety-label {
+  font-size: 9px;
+  fill: var(--warning);
+  font-weight: var(--weight-medium);
+}
+.bc-area {
+  fill: var(--primary-light);
+  opacity: 0.6;
+}
+.bc-line {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.bc-point {
+  fill: var(--surface);
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+.bc-point.danger {
+  fill: var(--primary);
+  stroke: var(--primary);
+}
+.bc-point-label {
+  font-size: 9px;
+  fill: var(--text-secondary);
+  font-weight: var(--weight-medium);
+  text-anchor: middle;
+}
+.bc-point-label.danger {
+  fill: var(--danger);
+  font-weight: var(--weight-semibold);
+}
+.bc-day-label {
+  font-size: 10px;
+  fill: var(--text-tertiary);
+  text-anchor: middle;
+}
+.bc-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-top: var(--space-sm);
+}
+.bc-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.bc-legend-line {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+}
+.bc-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+/* Flow buttons */
+.flow-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-base);
+  font-weight: var(--weight-medium);
+  border: 0.5px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  flex: 1;
+  background: var(--primary);
+  color: var(--text-inverse);
+  border-color: var(--primary);
+}
+.btn-primary:active { opacity: 0.8; }
+
+.btn-secondary {
+  flex: 1;
+  background: var(--surface);
+  color: #1677FF;
+  border-color: #1677FF;
+}
+.btn-secondary:active { background: var(--border-light); }
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: var(--font-sm);
+}
+
+/* ===== CASH MGMT CARD ===== */
+.cash-timeline {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  position: relative;
+}
+
+.cash-timeline-bar {
+  position: absolute;
+  top: 12px;
+  left: 24px;
+  right: 24px;
+  height: 4px;
+  background: var(--border-light);
+  border-radius: 2px;
+}
+
+.cash-timeline-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 400ms ease;
+}
+
+.cash-nodes {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.cash-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+}
+
+.cash-node-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  transition: all var(--transition);
+}
+.cash-node-dot.done { background: var(--primary); border-color: var(--primary); }
+.cash-node-dot.active { border-color: var(--primary); border-width: 2.5px; }
+
+.cash-node-date {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+}
+.cash-node-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.cash-compare {
+  margin-bottom: var(--space-md);
+}
+
+.cash-compare-title {
+  text-align: center;
+  font-size: var(--font-lg);
+  font-weight: var(--weight-normal);
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+}
+.cash-compare-title strong {
+  font-weight: var(--weight-semibold);
+  color: var(--warning);
+}
+
+.cash-compare-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.cash-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 120px;
+}
+
+.cash-bar {
+  width: 100%;
+  height: 56px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  background: #F5F5F5;
+}
+
+.cash-bar.upgrade {
+  background: #FFA940;
+  color: white;
+}
+
+.cash-bar-arrow {
+  width: 24px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cash-bar-arrow svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--warning);
+}
+
+.cash-bar-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: 1.35;
+}
+
+.cash-product {
+  background: var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.cash-product-name {
+  font-size: var(--font-base);
+  font-weight: var(--weight-semibold);
+  margin-bottom: var(--space-xs);
+}
+
+.cash-product-details {
+  display: flex;
+  gap: var(--space-lg);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+/* ===== ACTION CARDS ===== */
+.action-section-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.action-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.week-overview-link {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: var(--weight-normal);
+  color: #999999;
+  cursor: pointer;
+  padding: 4px 0 4px 8px;
+}
+
+.week-overview-link:active {
+  color: var(--primary);
+}
+
+.action-card {
+  background: var(--primary-pale);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+.action-card.done {
+  opacity: 0.5;
+}
+
+.action-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.action-title {
+  font-size: var(--font-base);
+  font-weight: var(--weight-semibold);
+}
+
+.action-desc {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  line-height: 1.5;
+}
+
+.cash-product-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  margin: 0 0 var(--space-md);
+}
+
+/* Collection details */
+.collection-details {
+  background: var(--surface);
+  border: 0.5px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+}
+
+.collection-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 10px 0;
+  margin: 0 var(--space-md);
+  border-bottom: 0.5px solid var(--border-light);
+  font-size: var(--font-sm);
+}
+
+.collection-row:last-of-type { border-bottom: none; }
+.collection-row.hidden { display: none; }
+.collection-details.expanded .collection-row.hidden { display: flex; }
+
+.collection-shop {
+  color: #333333;
+}
+
+.collection-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.collection-habit {
+  font-size: 10px;
+  color: #999999;
+}
+
+.collection-habit .late {
+  color: var(--danger);
+}
+
+.collection-amount {
+  color: #666666;
+  font-weight: var(--weight-normal);
+  white-space: nowrap;
+}
+
+.task-facts {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 10px var(--space-md);
+  min-width: 0;
+}
+
+.task-fact {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.task-fact-label {
+  display: block;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+
+.task-fact-value {
+  display: block;
+  font-size: var(--font-xs);
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collection-toggle {
+  width: 100%;
+  border: none;
+  border-top: 0.5px solid var(--border-light);
+  background: var(--surface);
+  color: #999999;
+  font-size: var(--font-xs);
+  font-family: inherit;
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.collection-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  transition: transform var(--transition);
+}
+
+.collection-details.expanded .collection-arrow {
+  transform: rotate(180deg);
+}
+
+/* Compare numbers */
+.compare-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+  font-size: var(--font-sm);
+}
+
+.compare-label { color: var(--text-secondary); }
+.compare-val  { font-weight: var(--weight-semibold); }
+.compare-arrow { color: var(--success); font-weight: var(--weight-semibold); }
+
+.action-buttons {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.action-buttons .btn-primary { flex: 1; }
+.action-buttons .btn-secondary { flex: 1; }
+
+/* Account flow mini */
+.account-flow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  column-gap: 6px;
+  width: 100%;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.account-flow-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.account-flow-item:nth-child(1) {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.account-flow-item:nth-child(2) {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.account-flow-item:nth-child(3) {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.account-flow-amount {
+  font-weight: var(--weight-normal);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.account-flow-sep {
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+/* ===== TIMELINE ===== */
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.timeline-tabs {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.timeline-tab {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  color: var(--text-secondary);
+  border: 0.5px solid transparent;
+}
+.timeline-tab.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.timeline-tab.disabled {
+  color: var(--text-tertiary);
+  cursor: default;
+}
+
+.timeline-group {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: var(--space-lg);
+}
+
+.timeline-group::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 24px;
+  bottom: -8px;
+  width: 0.5px;
+  background: var(--border);
+}
+
+.timeline-group:last-child::before { display: none; }
+
+.timeline-date-dot {
+  position: absolute;
+  left: 3px;
+  top: 4px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+}
+
+.timeline-date {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.timeline-item {
+  background: var(--primary-pale);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+  cursor: pointer;
+  border: 0.5px solid transparent;
+}
+.timeline-item:active { border-color: var(--primary); }
+.timeline-item.done { opacity: 0.5; }
+
+.timeline-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timeline-item-title {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+}
+
+.timeline-item-amount {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.timeline-item-status {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.employee-avatars {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.employee-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+}
+
+.loan-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  width: 100%;
+}
+
+.loan-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  position: relative;
+}
+
+.loan-metric:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--space-sm) / -2);
+  top: 2px;
+  bottom: 2px;
+  width: 0.5px;
+  background: var(--border);
+}
+
+.loan-metric-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+.loan-metric-value {
+  font-size: var(--font-xs);
+  font-weight: var(--weight-normal);
+  color: var(--text-secondary);
+}
+
+.loan-metric:nth-child(2) {
+  align-items: center;
+  text-align: center;
+}
+
+.loan-metric:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.account-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+
+.account-bank {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bank-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+.bank-logo {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.account-name {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.timeline-item-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+/* ===== SERVICE GRID ===== */
+.service-recent {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  overflow-x: auto;
+  padding-bottom: var(--space-xs);
+}
+.service-recent::-webkit-scrollbar { display: none; }
+
+.service-recent-item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.service-recent-item:active { background: var(--primary-light); }
+
+.service-recent-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+  flex-shrink: 0;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+}
+
+.service-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-md) var(--space-xs);
+  cursor: pointer;
+  position: relative;
+}
+.service-grid-item:active { opacity: 0.7; }
+
+.service-grid-icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+  object-fit: contain;
+}
+
+.service-grid-label {
+  font-size: var(--font-xs);
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+}
+
+/* ===== CONTINGENCY CARD ===== */
+.contingency-card {
+}
+.contingency-card.warning {
+  border-color: var(--warning);
+  border-left: 3px solid var(--warning);
+}
+
+.contingency-intro {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  line-height: 1.5;
+}
+
+.scenario-item {
+  margin-bottom: var(--space-md);
+}
+
+.scenario-bar-wrap {
+  height: 6px;
+  background: var(--border-light);
+  border-radius: 3px;
+  margin-bottom: var(--space-sm);
+  overflow: hidden;
+}
+
+.scenario-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 400ms ease;
+}
+.scenario-bar.green { background: var(--success); }
+.scenario-bar.blue  { background: var(--primary); }
+.scenario-bar.orange { background: var(--warning); }
+
+.scenario-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scenario-balance {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.scenario-action {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.fund-record-state {
+  background: var(--primary-pale);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.fund-record-action-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.fund-record-action-row .btn {
+  width: 100%;
+}
+
+/* ===== INSIGHT CARDS ===== */
+.insight-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.insight-title {
+  font-size: var(--font-base);
+  font-weight: var(--weight-semibold);
+  margin-bottom: var(--space-sm);
+}
+
+.insight-desc {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  line-height: 1.5;
+}
+
+.insight-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  width: 100%;
+  border: none;
+  border-top: 0.5px solid var(--border-light);
+  background: transparent;
+  padding: var(--space-md) 0 0;
+  font-family: inherit;
+  font-size: var(--font-xs);
+  color: #999999;
+  line-height: 1.45;
+  margin-top: var(--space-md);
+  text-align: left;
+  cursor: pointer;
+}
+
+.insight-source-arrow {
+  color: #999999;
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.mini-metric {
+  background: var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+}
+
+.action-card .mini-metric {
+  background: #FFFFFF;
+}
+
+.action-card .mini-metrics + .action-buttons {
+  margin-top: var(--space-md);
+}
+
+.insight-card .mini-metric {
+  background: #F0F6FF;
+}
+
+.mini-metric-label {
+  display: block;
+  font-size: 12px;
+  color: #333333;
+  margin-bottom: 4px;
+}
+
+.mini-metric-value {
+  display: block;
+  font-size: var(--font-base);
+  color: var(--primary);
+  font-weight: var(--weight-semibold);
+}
+
+.mini-metric-note {
+  display: block;
+  font-size: 10px;
+  color: #999999;
+  margin-top: 2px;
+}
+
+/* ===== BUSINESS CHANGE ===== */
+.business-change {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.change-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.change-card,
+.change-slide {
+  height: 132px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 0.5px solid #D8E8FF;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.change-card::after,
+.change-slide::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: -22px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(187,171,255,0.18) 0%, rgba(22,119,255,0) 70%);
+  pointer-events: none;
+}
+
+.change-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.change-card-title {
+  font-size: 14px;
+  font-weight: var(--weight-normal);
+  color: #8A96AA;
+}
+
+.change-card-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.change-card-icon::before,
+.change-card-icon::after {
+  content: "";
+  position: absolute;
+  background: #A8B2C6;
+}
+
+.change-card-icon::before {
+  right: 0;
+  top: 2px;
+  width: 8px;
+  height: 2px;
+}
+
+.change-card-icon::after {
+  right: 0;
+  top: 2px;
+  width: 2px;
+  height: 8px;
+}
+
+.change-metric-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.change-metric-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.change-metric-col:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.change-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+}
+
+.change-badge.in {
+  background: #EAF2FF;
+  color: var(--primary);
+}
+
+.change-badge.out {
+  background: #FFF4D9;
+  color: #B7791F;
+}
+
+.change-metric-value {
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-top: 6px;
+}
+
+.change-metric-percent {
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  color: #EF4444;
+  margin-top: 4px;
+  margin-left: 0;
+}
+
+.change-badge.out + .change-metric-value + .change-metric-percent {
+  color: #22C55E;
+}
+
+.change-card-note {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #6B7280;
+  margin-top: auto;
+  padding-bottom: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.change-slide .change-card-note {
+  margin-top: 6px;
+}
+
+.change-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.change-carousel-btn {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.change-track {
+  display: block;
+  height: 132px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+
+.change-track::-webkit-scrollbar { display: none; }
+
+.change-slide {
+  height: 132px;
+  scroll-snap-align: start;
+  padding-right: 32px;
+}
+
+.change-slide .change-card-icon {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+}
+
+.change-slide-main {
+  font-size: 14px;
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: 0;
+  line-height: 1.35;
+}
+
+.change-slide-value {
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: var(--weight-semibold);
+  margin-left: 3px;
+}
+
+.change-slide-headline {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  margin-top: 2px;
+}
+
+.change-slide .change-card-note {
+  transform: translateY(2px);
+}
+
+.change-dots {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.change-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #D9E1F0;
+}
+
+.change-dot.active { background: #8293B5; }
+
+/* Heat bar */
+.heat-bar-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 60px;
+  margin-bottom: var(--space-md);
+}
+
+.heat-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.heat-bar {
+  width: 100%;
+  max-width: 28px;
+  background: var(--primary);
+  opacity: 0.15;
+  border-radius: 3px 3px 0 0;
+  transition: height 400ms ease;
+}
+
+.heat-bar.high { opacity: 0.6; height: 48px; }
+.heat-bar.mid  { opacity: 0.35; height: 24px; }
+.heat-bar.low  { opacity: 0.1; height: 8px; }
+
+.heat-bar-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+/* Stacked bar */
+.stack-bar-wrap {
+  height: 8px;
+  background: var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: var(--space-sm);
+}
+
+.stack-seg {
+  height: 100%;
+}
+.stack-seg.green  { background: var(--primary); }
+.stack-seg.yellow { background: var(--primary); opacity: 0.5; }
+.stack-seg.orange { background: var(--primary); opacity: 0.25; }
+
+.stack-legend {
+  display: flex;
+  gap: var(--space-lg);
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.stack-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stack-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.stack-legend-dot.green  { background: var(--primary); }
+.stack-legend-dot.yellow { background: var(--primary); opacity: 0.5; }
+.stack-legend-dot.orange { background: var(--primary); opacity: 0.25; }
+
+/* Mini calendar */
+.mini-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+.mini-cal-header {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  padding: 4px 0;
+}
+
+.mini-cal-day {
+  font-size: var(--font-xs);
+  padding: 4px 0;
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+
+.mini-cal-day.highlight {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: var(--weight-semibold);
+}
+
+.mini-cal-day.faded { color: var(--text-tertiary); }
+
+/* Category bars */
+.cat-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cat-bar-label {
+  width: 32px;
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.cat-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cat-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 400ms ease;
+}
+
+.cat-bar-change {
+  width: 48px;
+  font-size: var(--font-xs);
+  font-weight: var(--weight-semibold);
+  text-align: right;
+}
+.cat-bar-change.up { color: var(--text-secondary); }
+.cat-bar-change.down { color: var(--text-secondary); }
+.cat-bar-change.flat { color: var(--text-tertiary); }
+
+/* ===== REVIEW CARD ===== */
+.review-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.review-metric {
+  text-align: center;
+  padding: var(--space-md) var(--space-xs);
+  background: var(--border-light);
+  border-radius: var(--radius-sm);
+}
+
+.review-metric-val {
+  font-size: var(--font-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.review-metric-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+.review-pressure {
+  margin-bottom: var(--space-md);
+}
+
+.review-pressure-label {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.review-pressure-compare {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.review-pressure-bar-wrap {
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--space-xs);
+  display: flex;
+}
+
+.review-pressure-bar {
+  height: 100%;
+  background: var(--success);
+  transition: width 400ms ease;
+}
+
+.review-pressure-drop {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--success);
+}
+
+.review-headline {
+  font-size: 18px;
+  font-weight: var(--weight-semibold);
+  color: var(--success);
+  margin-bottom: var(--space-md);
+}
+
+.review-pressure-name {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.review-pressure-num {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.review-pressure-bar-remain {
+  height: 100%;
+  background: var(--border);
+  border-radius: 0 4px 4px 0;
+}
+
+.review-streak {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--primary-pale);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  color: var(--primary);
+  margin-bottom: var(--space-md);
+}
+
+.review-streak-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  flex-shrink: 0;
+}
+
+.review-btn {
+  width: 100%;
+}
+
+.insights-bg {
+  margin: 0 calc(var(--space-lg) * -1);
+  padding: 8px var(--space-lg) 0;
+}
+
+/* Section title (outside card) */
+.section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: var(--weight-semibold);
+  padding: 0;
+  color: var(--text-primary);
+}
+
+.section-title img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.insights-bg .section-title {
+  margin-bottom: var(--space-md);
+}
+
+/* Insight card button full-width */
+.insight-btn {
+  width: 100%;
+  margin-top: var(--space-md);
+}
+
+.insight-chart-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-sm);
+}
+
+/* Scenario layout */
+.scenario-label-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.scenario-icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.scenario-icon.green-icon { background: var(--success); }
+.scenario-icon.blue-icon  { background: var(--primary); }
+.scenario-icon.orange-icon { background: var(--warning); }
+
+.scenario-label {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.scenario-amount {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.scenario-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.scenario-desc {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+.warning-text { color: var(--warning); }
+.primary-text { color: var(--primary); }
+.success-text { color: var(--success); }
+.danger-text  { color: var(--danger); }
+
+/* Service recent label */
+.service-recent-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-sm);
+}
+
+/* ===== BOTTOM SHEET ===== */
+.overlay {
+  position: absolute;
+  top: 107px;
+  left: 19px;
+  width: 375px;
+  bottom: 64px;
+  background: rgba(0,0,0,0.4);
+  z-index: 240;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+.overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sheet {
+  position: absolute;
+  bottom: 64px;
+  left: 19px;
+  transform: translateY(100%);
+  width: 375px;
+  max-height: 663px;
+  background: var(--surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  z-index: 250;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.sheet.show {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.sheet-handle {
+  display: none;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  font-size: var(--font-xl);
+  font-weight: var(--weight-semibold);
+}
+
+.sheet-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 24px;
+}
+.sheet-close:active { background: var(--border-light); }
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--space-lg) var(--space-2xl);
+}
+
+.week-overview-content {
+  padding-top: 2px;
+}
+
+.sheet-section {
+  margin-bottom: var(--space-lg);
+}
+
+.sheet-section-title {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.sheet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) 0;
+  border-bottom: 0.5px solid var(--border-light);
+}
+
+.sheet-row:last-child { border-bottom: none; }
+
+.sheet-row-label { font-size: var(--font-base); }
+.sheet-row-value { font-size: var(--font-base); font-weight: var(--weight-semibold); }
+.sheet-row-value.primary { color: var(--primary); }
+
+.sheet-total {
+  font-size: var(--font-base);
+  font-weight: var(--weight-semibold);
+  color: var(--primary);
+  text-align: right;
+  padding: var(--space-md) 0;
+}
+
+.sheet-note {
+  background: var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-md);
+  line-height: 1.5;
+}
+
+.sheet-input {
+  width: 100%;
+  padding: var(--space-md);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-2xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  text-align: center;
+  font-family: inherit;
+  margin: var(--space-md) 0;
+}
+.sheet-input:focus { outline: none; border-color: var(--primary); }
+
+.sheet-amount-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.sheet-amount-label {
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  font-weight: var(--weight-regular);
+}
+
+.sheet-amount-value {
+  font-size: var(--font-2xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.sheet-compliance {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin: var(--space-md) 0;
+  line-height: 1.4;
+}
+
+.sheet-actions {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-lg) 0;
+}
+
+.sheet-actions .btn { flex: 1; height: 44px; }
+
+.execution-steps {
+  padding-bottom: var(--space-lg);
+}
+
+.execution-step {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: calc(var(--space-lg) + 8px);
+}
+
+.execution-step::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 24px;
+  bottom: -16px;
+  width: 0.5px;
+  background: var(--border);
+}
+
+.execution-step:last-child::before { display: none; }
+
+.execution-dot {
+  position: absolute;
+  left: 3px;
+  top: 4px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+}
+
+.execution-step.running .execution-dot {
+  border-color: transparent;
+  border-top-color: var(--primary);
+  animation: executionSpin 0.8s linear infinite;
+}
+
+.execution-step.done .execution-dot {
+  background: var(--primary);
+  border-color: var(--primary);
+  animation: none;
+}
+
+.execution-step.done .execution-dot::after {
+  content: '✓';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -52%);
+  color: #fff;
+  font-size: 9px;
+  font-weight: var(--weight-bold);
+}
+
+@keyframes executionSpin {
+  to { transform: rotate(360deg); }
+}
+
+.execution-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.execution-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.execution-title {
+  font-size: var(--font-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.execution-desc {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.execution-preview {
+  width: 100%;
+  height: 48px;
+  margin-top: var(--space-lg);
+}
+
+.execution-preview.loading {
+  background: var(--border);
+  color: var(--text-tertiary);
+  border: none;
+  box-shadow: none;
+}
+
+.purchase-done-content {
+  padding: var(--space-2xl) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.purchase-done-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: var(--weight-bold);
+}
+
+.purchase-done-text {
+  text-align: center;
+  font-size: var(--font-2xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+/* Toast (centered within the phone column, not the viewport) */
+.toast {
+  position: fixed;
+  top: 60px;
+  left: calc(max(0px, (100vw - 1100px) / 2) + 375px / 2);
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--text-primary);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: var(--font-sm);
+  z-index: 300;
+  transition: transform 250ms ease;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ===== INTRO STORY PAGE ===== */
+body.intro-on { overflow: hidden; }
+
+.intro-page {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 48px;
+  text-align: center;
+}
+.intro-inner {
+  width: 100%;
+  max-width: min(1960px, calc(100vw - 48px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.intro-visual-wrap {
+  width: min(1960px, 100%);
+  height: min(82vh, 1240px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.intro-visual {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.intro-controls {
+  margin-top: -22px;
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+}
+.intro-arrow {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background: #FFFFFF;
+  color: var(--primary);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.intro-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.intro-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.intro-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #D8E8FF;
+}
+.intro-dot.active {
+  width: 18px;
+  background: var(--primary);
+}
+.intro-btn-wrap {
+  margin-top: 8px;
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.intro-btn {
+  display: inline-block;
+  padding: 18px 52px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.intro-btn[hidden] { display: none; }
+.intro-btn:active { opacity: 0.85; }
+
+/* ===== STAGE: phone (left) + guide (right), centered as a block ===== */
+.stage {
+  display: grid;
+  grid-template-columns: 413px 180px 413px;
+  align-items: start;
+  width: 1086px;
+  flex: 0 0 1086px;
+  margin: 0;
+  min-height: 0;
+  column-gap: 40px;
+}
+.stage-phone,
+.legacy-phone {
+  position: relative;
+  top: auto;
+  width: 413px;
+  height: 1000px;
+  overflow: visible;
+  border-radius: 0;
+}
+
+.prototype-title {
+  position: absolute;
+  left: 19px;
+  top: -8px;
+  width: 375px;
+  text-align: center;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: var(--weight-semibold);
+  color: #333333;
+}
+
+.legacy-phone {
+  height: 1000px;
+}
+/* the phone scrolls inside its sticky viewport */
+.stage-phone .phone-frame {
+  position: absolute;
+  left: 19px;
+  top: 107px;
+  height: 829px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.phone-shell {
+  position: absolute;
+  left: 0;
+  top: 52px;
+  width: 413px;
+  height: 884px;
+  z-index: 260;
+  pointer-events: none;
+  object-fit: contain;
+}
+
+.legacy-screen {
+  position: absolute;
+  left: 19px;
+  top: 107px;
+  width: 375px;
+  height: 829px;
+  background: #F0F6FF;
+  overflow: hidden;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.legacy-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.legacy-page {
+  min-height: 100%;
+  background: #FFFFFF;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.legacy-page-title {
+  font-size: 18px;
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.legacy-page-sub {
+  font-size: 12px;
+  color: #999999;
+  margin-bottom: 14px;
+}
+
+.legacy-list {
+  display: grid;
+  gap: 10px;
+}
+
+.legacy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #F7FAFF;
+  border-radius: 8px;
+}
+
+.legacy-row-main {
+  font-size: 13px;
+  color: #333333;
+}
+
+.legacy-row-sub {
+  display: block;
+  font-size: 11px;
+  color: #999999;
+  margin-top: 3px;
+}
+
+.legacy-row-amount {
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  color: var(--primary);
+}
+
+.legacy-placeholder-note {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #F5F6FA;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #666666;
+}
+
+.compare-rail {
+  position: sticky;
+  top: 122px;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.compare-node {
+  width: 108px;
+  border: 0.5px solid #FFD8A8;
+  background: #FFFFFF;
+  border-radius: 999px;
+  padding: 9px 8px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #666666;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.compare-node.active {
+  background: #FF8A00;
+  color: #FFFFFF;
+  border-color: #FF8A00;
+  font-weight: var(--weight-semibold);
+}
+
+.compare-line {
+  width: 1px;
+  height: 14px;
+  background: #FFD8A8;
+}
+
+.compare-callout {
+  position: absolute;
+  left: -10px;
+  width: 433px;
+  border: 2px solid #FF8A00;
+  border-radius: 16px;
+  box-shadow: 0 0 0 5px rgba(255, 138, 0, 0.14);
+  pointer-events: none;
+  z-index: 520;
+  opacity: 0;
+  transform: translateY(0);
+  transition: opacity var(--transition), top 220ms ease, height 220ms ease;
+}
+
+.compare-callout.show {
+  opacity: 1;
+}
+
+.guide-header { display: none; }
+.guide-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+  letter-spacing: 0.01em;
+}
+
+/* ===== 背景分析区（标题下方、tab 上方） ===== */
+.bg-section {
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+.bg-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.bg-kicker {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0;
+}
+.bg-heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.45;
+  margin-bottom: 0;
+}
+.bg-lead,
+.bg-note {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #666666;
+  margin-bottom: 16px;
+}
+.bg-lead strong,
+.bg-note strong { color: var(--text-primary); font-weight: 600; }
+
+.bg-visual-slot {
+  margin: 18px 0 26px;
+  padding: 18px;
+  min-height: 140px;
+  border: 1px dashed #C9D8F2;
+  border-radius: 10px;
+  background: #F8FBFF;
+  color: #8A96AA;
+}
+.bg-visual-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4B6FAE;
+  margin-bottom: 6px;
+}
+.bg-visual-desc {
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.bg-section-block {
+  margin-top: 26px;
+}
+.bg-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+.bg-load-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0 0 26px;
+}
+.bg-load-row {
+  padding: 14px 12px;
+  background: #F7FAFF;
+  border: 0.5px solid #E2ECFF;
+  border-radius: 8px;
+}
+.bg-load-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.bg-load-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #E9F1FF;
+  position: relative;
+  flex-shrink: 0;
+}
+.bg-load-icon.search::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+}
+.bg-load-icon.search::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 16px;
+  width: 7px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary);
+  transform: rotate(45deg);
+}
+.bg-load-icon.memory::before,
+.bg-load-icon.memory::after {
+  content: "";
+  position: absolute;
+  background: var(--primary);
+  border-radius: 2px;
+}
+.bg-load-icon.memory::before {
+  left: 7px;
+  top: 6px;
+  width: 12px;
+  height: 15px;
+}
+.bg-load-icon.memory::after {
+  left: 10px;
+  top: 9px;
+  width: 6px;
+  height: 2px;
+  box-shadow: 0 4px 0 rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.85);
+}
+.bg-load-icon.judge::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 12px;
+  width: 14px;
+  height: 8px;
+  border-left: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
+  transform: rotate(-45deg);
+  border-radius: 1px;
+}
+.bg-load-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.bg-load-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #666666;
+}
+
+.bg-flow {
+  display: grid;
+  grid-template-columns: 1fr 30px 1fr 30px 1fr;
+  align-items: center;
+  margin-top: 14px;
+}
+.bg-flow-card {
+  height: 128px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #FFFFFF;
+  border: 0.5px solid #E2ECFF;
+  display: flex;
+  flex-direction: column;
+}
+.bg-flow-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+.bg-flow-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bg-flow-tag {
+  font-size: 11px;
+  color: #4B6FAE;
+  background: #F0F6FF;
+  border-radius: 999px;
+  padding: 4px 7px;
+}
+.bg-flow-arrow {
+  text-align: center;
+  color: var(--primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+.bg-flow-card.primary {
+  background: linear-gradient(180deg, #F8FBFF 0%, #EDF4FF 100%);
+  border-color: #CFE0FF;
+}
+.bg-flow-note {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #666666;
+}
+
+/* step selector — lightweight underline tab bar */
+.guide-steps {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.guide-steps::-webkit-scrollbar { display: none; }
+.guide-step {
+  position: relative;
+  flex: 1 0 0;
+  min-width: max-content;
+  padding: 12px 8px;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  white-space: nowrap;
+}
+.guide-step::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  height: 2px;
+  background: transparent;
+  transition: background 150ms ease;
+}
+.guide-step:hover { color: var(--text-primary); }
+.guide-step.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+.guide-step.active::after { background: var(--primary); }
+
+/* commentary panel */
+.guide-panel { animation: guideFade 250ms ease; }
+@keyframes guideFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.gp-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+.gp-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+.gp-block { margin-bottom: 22px; }
+.gp-block-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.gp-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #666666;
+  margin-bottom: 18px;
+}
+.gp-text strong { color: var(--text-primary); font-weight: 600; }
+.gp-text .num { color: var(--primary); font-weight: 600; }
+
+/* 要点列表（用于无图的 tab） */
+.gp-points {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.gp-points li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #666666;
+}
+.gp-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.gp-points li:last-child { margin-bottom: 0; }
+.gp-points strong { color: var(--text-primary); font-weight: 600; }
+
+/* design value (closing block, always visible) */
+.gp-divider {
+  height: 0.5px;
+  background: var(--border);
+  margin: 40px 0 32px;
+  border: none;
+}
+.gp-value-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+.gp-value-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.gp-value-label {
+  flex-shrink: 0;
+  width: 56px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  padding-top: 2px;
+}
+.gp-value-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+.gp-value-text strong { color: var(--text-primary); font-weight: 600; }
+
+/* main-thread section anchors (scroll inside .phone-frame) */
+[data-step] { scroll-margin-top: 90px; }
+</style>
+</head>
+<body class="intro-on">
+
+<!-- ===== INTRO STORY PAGE ===== -->
+<div class="intro-page" id="introPage">
+  <div class="intro-inner">
+    <div class="intro-visual-wrap">
+      <img class="intro-visual" id="introVisual" src="intro-shots/no1.png" alt="">
+    </div>
+    <div class="intro-controls">
+      <button class="intro-arrow" id="introPrevBtn" type="button" aria-label="上一张">‹</button>
+      <div class="intro-dots" id="introDots" aria-hidden="true">
+        <span class="intro-dot active"></span>
+        <span class="intro-dot"></span>
+        <span class="intro-dot"></span>
+        <span class="intro-dot"></span>
+      </div>
+      <button class="intro-arrow" id="introNextBtn" type="button" aria-label="下一张">›</button>
+    </div>
+    <div class="intro-btn-wrap">
+      <button class="intro-btn" id="introEnterBtn" hidden>看看我的设想</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STAGE: legacy phone + compare nodes + fund map phone ===== -->
+<div class="stage" id="stage">
+<div class="legacy-phone">
+  <div class="prototype-title">现有的手机银行</div>
+  <div class="legacy-screen">
+    <img class="legacy-shot" id="legacyShot" src="legacy-shots/shouye.png" alt="">
+  </div>
+  <img class="phone-shell" src="../phone.png" alt="">
+</div>
+
+<div class="compare-rail" id="compareRail">
+  <button class="compare-node active" data-compare="home" type="button">看首页</button>
+  <div class="compare-line"></div>
+  <button class="compare-node" data-compare="receivable" type="button">查回款</button>
+  <div class="compare-line"></div>
+  <button class="compare-node" data-compare="payment" type="button">预约付款</button>
+  <div class="compare-line"></div>
+  <button class="compare-node" data-compare="salary" type="button">批量发薪</button>
+  <div class="compare-line"></div>
+  <button class="compare-node" data-compare="cash" type="button">处理闲钱</button>
+  <div class="compare-line"></div>
+  <button class="compare-node" data-compare="analysis" type="button">收支分析</button>
+  <div class="compare-line"></div>
+  <button class="compare-node" data-compare="stockup" type="button">囤货分析</button>
+</div>
+
+<div class="stage-phone">
+<div class="role-switch" id="roleSwitch">
+  <button class="role-option active" data-role="supplier" type="button" data-copy="shell.supplierRole"></button>
+  <button class="role-option" data-role="restaurant" type="button" data-copy="shell.restaurantRole"></button>
+</div>
+<div class="prototype-title" data-copy="shell.title">预设的资金管理能力</div>
+<div class="phone-frame" id="app">
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <img src="../name.png" alt="" style="display:block; width:100%; margin-bottom:4px;">
+
+    <div class="card week-summary">
+      <img class="week-summary-visual" src="../sulan.png" alt="">
+      <div class="week-summary-text" id="weekSummaryText"></div>
+    </div>
+
+    <!-- LAYER 1: SMART FUND MAP -->
+    <div class="card" data-step="step-1">
+      <div class="map-tabs show-left">
+        <div class="map-tab active" onclick="switchMapView('flow', this)"><span data-copy="fundMap.flowTab"></span></div>
+        <div class="map-tab" onclick="switchMapView('balance', this)"><span data-copy="fundMap.balanceTab"></span></div>
+      </div>
+
+      <!-- Flow View -->
+      <div class="flow-view" id="flowView">
+        <div class="flow-grid">
+          <!-- 流入列 -->
+          <div class="flow-col in">
+            <div class="flow-col-title"><span class="arrow-dn">↓</span> <span data-copy="fundMap.inTitle"></span></div>
+            <div class="flow-col-total"></div>
+            <div class="flow-side">
+              <div class="flow-card in"><span class="fc-name"></span><span class="fc-amt"></span></div>
+              <div class="flow-card in"><span class="fc-name"></span><span class="fc-amt"></span></div>
+              <div class="flow-card in"><span class="fc-name"></span><span class="fc-amt"></span></div>
+            </div>
+          </div>
+
+          <!-- 左连接线 -->
+          <div class="flow-link">
+            <div class="flow-col-title">&nbsp;</div>
+            <div class="flow-col-total">&nbsp;</div>
+            <svg viewBox="0 0 22 100" preserveAspectRatio="none">
+              <path d="M0,16.7 C11,16.7 11,50 22,50" stroke="#EBEDF0" stroke-width="1" fill="none"/>
+              <path d="M0,50 C11,50 11,50 22,50" stroke="#EBEDF0" stroke-width="1" fill="none"/>
+              <path d="M0,83.3 C11,83.3 11,50 22,50" stroke="#EBEDF0" stroke-width="1" fill="none"/>
+            </svg>
+          </div>
+
+          <!-- 中间金额 -->
+          <div class="flow-pool-col">
+            <div class="flow-col-title">&nbsp;</div>
+            <div class="flow-col-total">&nbsp;</div>
+            <div class="flow-pool-box">
+              <span class="flow-pool-label" data-copy="fundMap.poolTitle"></span>
+              <span class="flow-pool-amt"></span>
+            </div>
+          </div>
+
+          <!-- 右连接线 -->
+          <div class="flow-link">
+            <div class="flow-col-title">&nbsp;</div>
+            <div class="flow-col-total">&nbsp;</div>
+            <svg viewBox="0 0 22 100" preserveAspectRatio="none">
+              <path d="M0,50 C11,50 11,12.5 22,12.5" stroke="#EBEDF0" stroke-width="1" fill="none"/>
+              <path d="M0,50 C11,50 11,37.5 22,37.5" stroke="#EBEDF0" stroke-width="1" fill="none"/>
+              <path d="M0,50 C11,50 11,62.5 22,62.5" stroke="#EBEDF0" stroke-width="1" fill="none"/>
+              <path d="M0,50 C11,50 11,87.5 22,87.5" stroke="#EBEDF0" stroke-width="1" fill="none"/>
+            </svg>
+          </div>
+
+          <!-- 流出列 -->
+          <div class="flow-col out">
+            <div class="flow-col-title"><span class="arrow-up">↑</span> <span data-copy="fundMap.outTitle"></span></div>
+            <div class="flow-col-total"></div>
+            <div class="flow-side">
+              <div class="flow-card out"><span class="fc-name"></span><span class="fc-amt"></span></div>
+              <div class="flow-card out"><span class="fc-name"></span><span class="fc-amt"></span></div>
+              <div class="flow-card out"><span class="fc-name"></span><span class="fc-amt"></span></div>
+              <div class="flow-card out"><span class="fc-name"></span><span class="fc-amt"></span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Balance View -->
+      <div class="balance-view" id="balanceView">
+      <svg class="balance-curve-svg" viewBox="0 0 320 130" id="balanceCurve">
+        <!-- 留用线 -->
+        <line class="bc-safety" x1="24" y1="85" x2="296" y2="85"/>
+        <text class="bc-safety-label" x="296" y="82" text-anchor="end" data-copy="fundMap.reserveLine"></text>
+
+        <!-- 区域填充 -->
+        <path class="bc-area" d="M24,18 L72,52 L120,32 L168,48 L216,28 L264,38 L296,30 L296,95 L24,95 Z"/>
+
+        <!-- 曲线 -->
+        <path class="bc-line" d="M24,18 L72,52 L120,32 L168,48 L216,28 L264,38 L296,30"/>
+
+        <!-- 数据点 + 金额标注 -->
+        <g id="bcPoints">
+          <circle class="bc-point" cx="24" cy="18" r="3"/>
+          <text class="bc-point-label" x="24" y="11"></text>
+
+          <circle class="bc-point" cx="72" cy="52" r="3"/>
+          <text class="bc-point-label" x="72" y="66"></text>
+
+          <circle class="bc-point" cx="120" cy="32" r="3"/>
+          <text class="bc-point-label" x="120" y="25"></text>
+
+          <circle class="bc-point" cx="168" cy="48" r="3"/>
+          <text class="bc-point-label" x="168" y="62"></text>
+
+          <circle class="bc-point" cx="216" cy="28" r="3"/>
+          <text class="bc-point-label" x="216" y="21"></text>
+
+          <circle class="bc-point" cx="264" cy="38" r="3"/>
+          <circle class="bc-point" cx="296" cy="30" r="3"/>
+          <text class="bc-point-label" x="296" y="23"></text>
+        </g>
+
+        <!-- 周标签 -->
+        <text class="bc-day-label" x="24" y="125" data-copy="fundMap.day1"></text>
+        <text class="bc-day-label" x="72" y="125" data-copy="fundMap.day2"></text>
+        <text class="bc-day-label" x="120" y="125" data-copy="fundMap.day3"></text>
+        <text class="bc-day-label" x="168" y="125" data-copy="fundMap.day4"></text>
+        <text class="bc-day-label" x="216" y="125" data-copy="fundMap.day5"></text>
+        <text class="bc-day-label" x="264" y="125" data-copy="fundMap.day6"></text>
+        <text class="bc-day-label" x="296" y="125" data-copy="fundMap.day7"></text>
+      </svg>
+
+      <div class="bc-legend">
+        <div class="bc-legend-item"><span class="bc-legend-line" style="background:var(--primary);"></span><span data-copy="fundMap.balanceLegend"></span></div>
+        <div class="bc-legend-item"><span style="width:14px;border-top:1px dashed var(--warning);"></span><span data-copy="fundMap.reserveLegend"></span></div>
+      </div>
+
+      </div>
+    </div>
+
+    <!-- LAYER 2: TODAY'S ACTIONS -->
+    <div class="card action-section-card" data-step="step-2"></div>
+
+    <!-- LAYER 3: BUSINESS CHANGE -->
+    <div class="business-change" id="businessChange">
+      <div class="change-card-grid">
+        <div class="change-card">
+          <div class="change-card-top">
+            <div class="change-card-title" data-copy="analysis.title"></div>
+            <div class="change-card-icon"></div>
+          </div>
+          <div class="change-metric-pair">
+            <div class="change-metric-col">
+              <span class="change-badge in" data-copy="analysis.inLabel"></span>
+              <span class="change-metric-value" data-copy="analysis.inAmount"></span>
+              <span class="change-metric-percent" data-copy="analysis.inChange"></span>
+            </div>
+            <div class="change-metric-col">
+              <span class="change-badge out" data-copy="analysis.outLabel"></span>
+              <span class="change-metric-value" data-copy="analysis.outAmount"></span>
+              <span class="change-metric-percent" data-copy="analysis.outChange"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-carousel" data-copy-aria="analysis.carouselAria">
+          <button class="change-carousel-btn" type="button" data-copy-aria="analysis.switchAria" onclick="nextChangeSlide(this)"></button>
+          <div class="change-track">
+            <div class="change-slide">
+              <div class="change-card-top">
+                <div class="change-card-title" data-copy="analysis.slide1Title"></div>
+                <div class="change-card-icon"></div>
+              </div>
+              <div class="change-slide-headline"><span class="change-slide-main" data-copy="analysis.slide1Main"></span></div>
+              <div class="change-card-note" data-copy="analysis.slide1Note"></div>
+            </div>
+            <div class="change-slide">
+              <div class="change-card-top">
+                <div class="change-card-title" data-copy="analysis.slide2Title"></div>
+                <div class="change-card-icon"></div>
+              </div>
+              <div class="change-slide-headline"><span class="change-slide-main" data-copy="analysis.slide2Main"></span><span class="change-slide-value" data-copy="analysis.slide2Value"></span></div>
+              <div class="change-card-note" data-copy="analysis.slide2Note"></div>
+            </div>
+            <div class="change-slide">
+              <div class="change-card-top">
+                <div class="change-card-title" data-copy="analysis.slide3Title"></div>
+                <div class="change-card-icon"></div>
+              </div>
+              <div class="change-slide-headline"><span class="change-slide-main" data-copy="analysis.slide3Main"></span><span class="change-slide-value" data-copy="analysis.slide3Value"></span></div>
+              <div class="change-card-note" data-copy="analysis.slide3Note"></div>
+            </div>
+          </div>
+          <div class="change-dots">
+            <span class="change-dot active"></span>
+            <span class="change-dot"></span>
+            <span class="change-dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER 4: INSIGHTS -->
+    <div class="insights-bg" data-step="step-4"></div>
+
+  </div><!-- /content -->
+</div><!-- /phone-frame -->
+<img class="phone-shell" src="../phone.png" alt="">
+<div class="compare-callout" id="compareCallout" aria-hidden="true"></div>
+
+<!-- ===== OVERLAY ===== -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+
+<!-- ===== BOTTOM SHEETS ===== -->
+
+<!-- Week Overview Sheet -->
+<div class="sheet" id="sheet-weekOverview">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.weekOverviewTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="week-overview-content" id="weekOverviewContent"></div>
+  </div>
+</div>
+
+<!-- Detail Sheet -->
+<div class="sheet" id="sheet-detail">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.detailTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-section">
+      <div class="sheet-section-title" data-copy="sheets.detailInTitle"></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailIn1Label"></span><span class="sheet-row-value" data-copy="sheets.detailIn1Value"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailIn2Label"></span><span class="sheet-row-value" data-copy="sheets.detailIn2Value"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailIn3Label"></span><span class="sheet-row-value" data-copy="sheets.detailIn3Value"></span></div>
+      <div class="sheet-total" data-copy="sheets.detailInTotal"></div>
+    </div>
+    <div class="sheet-section">
+      <div class="sheet-section-title" data-copy="sheets.detailPoolTitle"></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailPool1Label"></span><span class="sheet-row-value" data-copy="sheets.detailPool1Value"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailPool2Label"></span><span class="sheet-row-value" data-copy="sheets.detailPool2Value"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" style="color:var(--primary)" data-copy="sheets.detailPoolSubtotalLabel"></span><span class="sheet-row-value primary" data-copy="sheets.detailPoolSubtotalValue"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailPool3Label"></span><span class="sheet-row-value" style="color:var(--primary)" data-copy="sheets.detailPool3Value"></span></div>
+      <div class="sheet-total" data-copy="sheets.detailPoolTotal"></div>
+    </div>
+    <div class="sheet-section">
+      <div class="sheet-section-title" data-copy="sheets.detailOutTitle"></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailOut1Label"></span><span class="sheet-row-value" data-copy="sheets.detailOut1Value"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailOut2Label"></span><span class="sheet-row-value" data-copy="sheets.detailOut2Value"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailOut3Label"></span><span class="sheet-row-value" data-copy="sheets.detailOut3Value"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.detailOut4Label"></span><span class="sheet-row-value" data-copy="sheets.detailOut4Value"></span></div>
+      <div class="sheet-total" data-copy="sheets.detailOutTotal"></div>
+    </div>
+    <div class="sheet-note" data-copy="sheets.detailNote"></div>
+  </div>
+</div>
+
+
+<!-- Cash Config Sheet -->
+<div class="sheet" id="sheet-cashConfig">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.cashTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-amount-row"><span class="sheet-amount-label" data-copy="sheets.cashAmountLabel"></span><span class="sheet-amount-value" data-copy="sheets.cashAmountValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.cashTimeLabel"></span><span class="sheet-row-value" data-copy="sheets.cashTimeValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.cashReservedLabel"></span><span class="sheet-row-value" data-copy="sheets.cashReservedValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.cashProductLabel"></span><span class="sheet-row-value" data-copy="sheets.cashProductValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.cashYieldLabel"></span><span class="sheet-row-value" data-copy="sheets.cashYieldValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.cashRiskLabel"></span><span class="sheet-row-value" data-copy="sheets.cashRiskValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.cashReminderLabel"></span><span class="sheet-row-value" style="color:var(--primary)" data-copy="sheets.cashReminderValue"></span></div>
+    <div class="sheet-compliance" data-copy="sheets.cashCompliance"></div>
+    <div class="sheet-actions">
+      <button class="btn btn-secondary" onclick="closeSheet()" data-copy="buttons.cancel"></button>
+      <button class="btn btn-primary" onclick="openSheet('executionProcess')" data-copy="buttons.confirmArrangement"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Execution Process Sheet -->
+<div class="sheet" id="sheet-executionProcess">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.executionTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="execution-steps">
+      <div class="execution-step">
+        <div class="execution-dot"></div>
+        <div class="execution-main">
+          <div class="execution-title-row"><span class="execution-title" data-copy="sheets.execution1Title"></span></div>
+          <div class="execution-desc" data-copy="sheets.execution1Desc"></div>
+        </div>
+      </div>
+
+      <div class="execution-step">
+        <div class="execution-dot"></div>
+        <div class="execution-main">
+          <div class="execution-title-row"><span class="execution-title" data-copy="sheets.execution2Title"></span></div>
+          <div class="execution-desc" data-copy="sheets.execution2Desc"></div>
+        </div>
+      </div>
+
+      <div class="execution-step">
+        <div class="execution-dot"></div>
+        <div class="execution-main">
+          <div class="execution-title-row"><span class="execution-title" data-copy="sheets.execution3Title"></span></div>
+          <div class="execution-desc" data-copy="sheets.execution3Desc"></div>
+        </div>
+      </div>
+
+      <div class="execution-step">
+        <div class="execution-dot"></div>
+        <div class="execution-main">
+          <div class="execution-title-row"><span class="execution-title" data-copy="sheets.execution4Title"></span></div>
+          <div class="execution-desc" data-copy="sheets.execution4Desc"></div>
+        </div>
+      </div>
+
+      <div class="execution-step">
+        <div class="execution-dot"></div>
+        <div class="execution-main">
+          <div class="execution-title-row"><span class="execution-title" data-copy="sheets.execution5Title"></span></div>
+          <div class="execution-desc" data-copy="sheets.execution5Desc"></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary execution-preview" id="executionBtn" onclick="startExecutionProcess()" data-copy="buttons.confirm"></button>
+  </div>
+</div>
+
+<!-- Purchase Done Sheet -->
+<div class="sheet" id="sheet-purchaseDone">
+  <div class="sheet-handle"></div>
+  <div class="sheet-body">
+    <div class="purchase-done-content">
+      <div class="purchase-done-icon">✓</div>
+      <div class="purchase-done-text" data-copy="sheets.doneText"></div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-primary" onclick="closeSheet()" data-copy="buttons.gotIt"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Cash Rules Sheet -->
+<div class="sheet" id="sheet-cashRules">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.rulesTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-section">
+      <div class="sheet-section-title" data-copy="sheets.rulesProduct"></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.rulesTypeLabel"></span><span class="sheet-row-value" data-copy="sheets.rulesTypeValue"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.rulesYieldLabel"></span><span class="sheet-row-value" data-copy="sheets.rulesYieldValue"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.rulesRiskLabel"></span><span class="sheet-row-value" data-copy="sheets.rulesRiskValue"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.rulesMinimumLabel"></span><span class="sheet-row-value" data-copy="sheets.rulesMinimumValue"></span></div>
+      <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.rulesRedeemLabel"></span><span class="sheet-row-value" data-copy="sheets.rulesRedeemValue"></span></div>
+    </div>
+    <div class="sheet-note" data-copy="sheets.rulesNote"></div>
+    <div class="sheet-actions">
+      <button class="btn btn-secondary" style="flex:1;" onclick="closeSheet()" data-copy="buttons.understood"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Transfer Sheet -->
+<div class="sheet" id="sheet-transfer">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.transferTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.transferFromLabel"></span><span class="sheet-row-value" data-copy="sheets.transferFromValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.transferToLabel"></span><span class="sheet-row-value" data-copy="sheets.transferToValue"></span></div>
+    <div style="font-size:14px;color:var(--text-secondary);margin:16px 0 8px;" data-copy="sheets.transferAmountLabel"></div>
+    <input class="sheet-input" data-copy-value="sheets.transferAmountValue" readonly>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.transferArrivalLabel"></span><span class="sheet-row-value" style="color:var(--success)" data-copy="sheets.transferArrivalValue"></span></div>
+    <div class="sheet-compliance" data-copy="sheets.transferCompliance"></div>
+    <div class="sheet-actions">
+      <button class="btn btn-primary" onclick="closeSheet();showToast(COMMON_COPY.toasts.transferSuccess)" data-copy="buttons.confirmTransfer"></button>
+      <button class="btn btn-secondary" onclick="closeSheet()" data-copy="buttons.cancel"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Evidence Sheet: Price -->
+<div class="sheet" id="sheet-evidencePrice">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.evidenceTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-section"></div>
+    <div class="sheet-note"></div>
+  </div>
+</div>
+
+<!-- Evidence Sheet: Holiday -->
+<div class="sheet" id="sheet-evidenceHoliday">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.evidenceTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-section"></div>
+    <div class="sheet-note"></div>
+  </div>
+</div>
+
+<!-- Evidence Sheet: Labor -->
+<div class="sheet" id="sheet-evidenceLabor">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.evidenceTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-section"></div>
+    <div class="sheet-note"></div>
+  </div>
+</div>
+
+<!-- Loan Sheet -->
+<div class="sheet" id="sheet-loan">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" data-copy="sheets.loanTitle"></span>
+    <span class="sheet-close" onclick="closeSheet()">×</span>
+  </div>
+  <div class="sheet-body">
+    <div style="font-size:40px;font-weight:600;text-align:center;padding:20px 0;color:var(--primary)" data-copy="sheets.loanAmount"></div>
+    <div style="text-align:center;font-size:12px;color:var(--text-secondary);margin-bottom:20px;" data-copy="sheets.loanSubtitle"></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.loanStatusLabel"></span><span class="sheet-row-value" data-copy="sheets.loanStatusValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.loanSceneLabel"></span><span class="sheet-row-value" data-copy="sheets.loanSceneValue"></span></div>
+    <div class="sheet-row"><span class="sheet-row-label" data-copy="sheets.loanSourceLabel"></span><span class="sheet-row-value" data-copy="sheets.loanSourceValue"></span></div>
+    <div class="sheet-compliance" data-copy="sheets.loanCompliance"></div>
+    <div class="sheet-actions">
+      <button class="btn btn-primary" onclick="closeSheet();showToast(COMMON_COPY.toasts.viewDetails)" data-copy="buttons.viewDetails"></button>
+      <button class="btn btn-secondary" onclick="closeSheet();showToast(COMMON_COPY.toasts.managerContacted)" data-copy="buttons.contactManager"></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+</div><!-- /stage-phone -->
+
+</div><!-- /stage -->
+
+<script>
+// ===== 右侧原型文案编辑区：公共文案 =====
+const COMMON_COPY = {
+  shell: {
+    title: '预设的资金管理能力',
+    supplierRole: '便利店供货商',
+    restaurantRole: '社区餐饮店'
+  },
+  fundMap: {
+    flowTab: '本周资金预计流向',
+    balanceTab: '每天预计余额',
+    inTitle: '预计进账',
+    poolTitle: '现有资金',
+    outTitle: '预计支出',
+    reserveLine: '先别动 ¥100,000',
+    balanceLegend: '预计余额',
+    reserveLegend: '先别动的钱',
+    day1: '一',
+    day2: '二',
+    day3: '三',
+    day4: '四',
+    day5: '五',
+    day6: '六',
+    day7: '日'
+  },
+  analysis: {
+    title: '本月收支分析',
+    inLabel: '收',
+    inAmount: '¥82.6万',
+    inChange: '+12%',
+    outLabel: '支',
+    outAmount: '¥61.4万',
+    outChange: '-8%',
+    carouselAria: '经营变化滑动卡片',
+    switchAria: '切换经营变化卡片',
+    slide1Title: '进账节奏',
+    slide1Main: '主要集中在周末',
+    slide1Note: '7月以来淡旺季明显，周末生意忙',
+    slide2Title: '客户结构',
+    slide2Main: '大额客户变多',
+    slide2Value: '42%',
+    slide2Note: '大客户晚到账，资金波动会更明显',
+    slide3Title: '资金周转',
+    slide3Main: '本月周转快',
+    slide3Value: '1.8天',
+    slide3Note: '比上月短0.6天，主要受大客户影响'
+  },
+  sheets: {
+    weekOverviewTitle: '本周资金概览',
+    detailTitle: '这周钱从哪来、花到哪去',
+    detailInTitle: '这周会进账',
+    detailIn1Label: '收单到账',
+    detailIn1Value: '¥142,800',
+    detailIn2Label: '客户结账',
+    detailIn2Value: '¥108,500',
+    detailIn3Label: '其他进账',
+    detailIn3Value: '¥35,200',
+    detailInTotal: '合计 ¥286,500',
+    detailPoolTitle: '现在几张卡里能用的钱',
+    detailPool1Label: '经营主账户',
+    detailPool1Value: '¥186,000',
+    detailPool2Label: '收单账户',
+    detailPool2Value: '¥94,200',
+    detailPoolSubtotalLabel: '小计',
+    detailPoolSubtotalValue: '¥280,200',
+    detailPool3Label: '另一张常用卡',
+    detailPool3Value: '¥80,000',
+    detailPoolTotal: '合计 ¥360,200',
+    detailOutTitle: '这周要付出去',
+    detailOut1Label: '供应商货款',
+    detailOut1Value: '¥168,000',
+    detailOut2Label: '员工工资',
+    detailOut2Value: '¥52,300',
+    detailOut3Label: '经营贷',
+    detailOut3Value: '¥22,400',
+    detailOut4Label: '仓库电费',
+    detailOut4Value: '¥6,000',
+    detailOutTotal: '合计 ¥248,700',
+    detailNote: '明早货款、周四还款、周五工资都已经排进去了。城南餐饮如果晚到账，优先看另一张常用卡，不急着动贷款。',
+    cashTitle: '闲钱安排',
+    cashAmountLabel: '可配置金额',
+    cashAmountValue: '¥30,000',
+    cashTimeLabel: '预计管理时间',
+    cashTimeValue: '3天',
+    cashReservedLabel: '已经先留住的钱',
+    cashReservedValue: '货款、工资、还款',
+    cashProductLabel: '产品',
+    cashProductValue: '生生宝',
+    cashYieldLabel: '近7日年化',
+    cashYieldValue: '1.85%',
+    cashRiskLabel: '风险等级',
+    cashRiskValue: '低风险',
+    cashReminderLabel: '赎回提醒',
+    cashReminderValue: '3月20日 09:00',
+    cashCompliance: '预计收益不代表实际收益，产品收益和赎回到账时间以产品规则为准。',
+    executionTitle: '确认安排',
+    execution1Title: '先看能不能动',
+    execution1Desc: '货款、工资和还款已经留出，这 3 万短时间用不上',
+    execution2Title: '确认从哪张卡出',
+    execution2Desc: '从尾号 8821 的卡转入',
+    execution3Title: '确认产品规则',
+    execution3Desc: '查看收益、到账和赎回规则',
+    execution4Title: '提交安排',
+    execution4Desc: '提交后，到点会提醒你取回',
+    execution5Title: '安排完成',
+    execution5Desc: '明日起开始计算收益，到期前提醒',
+    doneText: '完成',
+    rulesTitle: '产品规则',
+    rulesProduct: '现金管理产品 A',
+    rulesTypeLabel: '产品类型',
+    rulesTypeValue: '货币基金',
+    rulesYieldLabel: '近7日年化',
+    rulesYieldValue: '1.85%',
+    rulesRiskLabel: '风险等级',
+    rulesRiskValue: '低风险',
+    rulesMinimumLabel: '起购金额',
+    rulesMinimumValue: '¥1.00',
+    rulesRedeemLabel: '赎回到账',
+    rulesRedeemValue: 'T+0 快速赎回',
+    rulesNote: '产品收益和赎回到账时间以产品规则为准。投资有风险，选择需谨慎。',
+    transferTitle: '从别的卡转过来',
+    transferFromLabel: '从哪张卡出',
+    transferFromValue: '常用卡 ¥80,000',
+    transferToLabel: '转到哪里',
+    transferToValue: '经营主账户',
+    transferAmountLabel: '转入金额',
+    transferAmountValue: '¥30,000',
+    transferArrivalLabel: '预计到账',
+    transferArrivalValue: '即时',
+    transferCompliance: '涉及转账操作，需你本人确认。',
+    evidenceTitle: '参考来源',
+    loanTitle: '经营周转方案',
+    loanAmount: '¥500,000',
+    loanSubtitle: '可用额度，需要时再用',
+    loanStatusLabel: '当前状态',
+    loanStatusValue: '未使用，额度充足',
+    loanSceneLabel: '用款场景',
+    loanSceneValue: '进货垫付、临时周转',
+    loanSourceLabel: '还款来源',
+    loanSourceValue: '经营回款',
+    loanCompliance: '额度、利率、提款结果以审批和签约为准。'
+  },
+  buttons: {
+    cancel: '取消',
+    confirmArrangement: '确认安排',
+    confirm: '确认',
+    gotIt: '我知道了',
+    understood: '知道了',
+    confirmTransfer: '确认转入',
+    viewDetails: '查看详情',
+    contactManager: '联系经理'
+  },
+  toasts: {
+    transferSuccess: '转入成功',
+    viewDetails: '查看详情',
+    managerContacted: '已联系经理'
+  },
+  execution: {
+    activeTitle: '确认安排',
+    idleButton: '确认',
+    runningButton: '安排中'
+  },
+  interactions: {
+    done: '已完成',
+    collapse: '收起',
+    expand: '全部'
+  }
+};
+
+// ===== 右侧原型文案编辑区：商户角色文案 =====
+const ROLE_CONTENT = {
+  supplier: {
+    summary: '王老板下午好。今天您预计有5笔款到账。其中城南餐饮有1.85万回款存在到账风。暑期已到来，学校周边的小卖部客流量下降，可减少上门推货的频次。',
+    flow: {
+      inTotal: '¥286,500',
+      pool: '¥360,200',
+      outTotal: '¥248,700',
+      inItems: [['收单到账', '¥142,800'], ['客户结账', '¥108,500'], ['其他进账', '¥35,200']],
+      outItems: [['供应商货款', '¥168,000'], ['员工工资', '¥52,300'], ['经营贷', '¥22,400'], ['仓库电费', '¥6,000']],
+      balanceLabels: ['36.0万', '11.7万', '18.0万', '12.8万', '23.5万', '', '25.2万']
+    },
+    actions: `
+      <div class="action-section-header"><span style="font-size:15px;font-weight:600;">今日关注(3)</span><button class="week-overview-link" onclick="openSheet('weekOverview')">本周资金概览</button></div>
+      <div class="action-card" id="action1">
+        <div class="action-card-header"><div class="action-title">今日应收 <span style="color:var(--primary);">¥108,500</span></div></div>
+        <div class="collection-details" id="collectionDetails">
+          <div class="collection-row"><span class="collection-main"><span class="collection-shop">丽娟生鲜店天目山路</span><span class="collection-habit">从预付款里扣除</span></span><span class="collection-amount">¥38,223.32</span></div>
+          <div class="collection-row"><span class="collection-main"><span class="collection-shop">老街便利店（西溪路521号）</span><span class="collection-habit">一般下午到账</span></span><span class="collection-amount">¥28,600</span></div>
+          <div class="collection-row"><span class="collection-main"><span class="collection-shop">城南餐饮店</span><span class="collection-habit">最近 5 次有 4 次<span class="late">常晚2周</span></span></span><span class="collection-amount">¥18,523.42</span></div>
+          <div class="collection-row hidden"><span class="collection-main"><span class="collection-shop">鑫源五金店</span><span class="collection-habit">一般会抹零/span></span><span class="collection-amount">¥13,485.42</span></div>
+          <div class="collection-row hidden"><span class="collection-main"><span class="collection-shop">小陈粮油店</span><span class="collection-habit">通常当天结</span></span><span class="collection-amount">¥9,800</span></div>
+          <button class="collection-toggle" onclick="toggleCollections(this)">全部<span class="collection-arrow">⌄</span></button>
+        </div>
+        <div class="action-buttons"><button class="btn btn-primary btn-sm" onclick="showToast('已发送回款提醒')">一键回款提醒</button></div>
+      </div>
+      <div class="action-card" id="action2">
+        <div class="action-card-header"><div class="action-title">预约工建银行经营贷还款 <span style="color:var(--primary);">¥168,000</span></div></div>
+        <div class="action-desc">过去 3 个月，你都在今天预约10号的经营贷还款。</div>
+        <div class="task-facts"><span class="task-fact"><span class="task-fact-label">应还日期</span><span class="task-fact-value">08.10</span></span><span class="task-fact"><span class="task-fact-label">还款对象</span><span class="task-fact-value">工建银行经营贷</span></span><span class="task-fact"><span class="task-fact-label">还款账户</span><span class="task-fact-value">建行(3283)</span></span></div>
+        <div class="action-buttons"><button class="btn btn-secondary btn-sm" onclick="openSheet('transfer')">更换还款账户</button><button class="btn btn-primary btn-sm" type="button">预约还款</button></div>
+      </div>
+      <div class="action-card" id="action3">
+        <div class="action-card-header"><div class="action-title">有<span style="color:var(--primary);">¥300,000</span> 闲置资金，可转入天天宝</div></div>
+        <div class="action-desc">该笔资金预计到本月20日前用不上，可暂时转入天天宝，赚几顿早餐钱。</div>
+        <img class="cash-product-img" src="../licai.png" alt="天天宝">
+        <div class="action-buttons"><button class="btn btn-primary btn-sm" onclick="openSheet('cashConfig')">去转入</button></div>
+      </div>`,
+    timeline: `
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月17日 周一</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">5家客户该结账</span><span class="timeline-item-amount">¥108,500</span></div><div class="account-info-row"><div class="account-bank"><span>重点看城南餐饮，其他几家通常准时</span></div></div><div class="timeline-item-actions"><button class="btn btn-primary btn-sm" onclick="showToast('已发送回款提醒')">一键回款提醒</button></div></div></div>
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月18日 周二</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">工建银行经营贷</span><span class="timeline-item-amount">¥168,000</span></div><div class="account-info-row"><div class="account-bank"><img class="bank-logo" src="../jianshe.png" alt="建设银行"><span>建设银行</span></div><span class="account-name">尾号 3283 已够付</span></div><div class="timeline-item-actions"><button class="btn btn-secondary btn-sm" onclick="openSheet('transfer')">换张卡</button><button class="btn btn-primary btn-sm" onclick="showToast('已预约付款')">预约付款</button></div></div></div>
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月19日 周三</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">缴仓库电费</span><span class="timeline-item-amount">¥6,000</span></div><div class="account-info-row"><div class="account-bank"><img class="bank-logo" src="../boc.png" alt="中国银行"><span>中国银行</span></div><span class="account-name">天目山路总物业(6621)</span></div><div class="timeline-item-actions"><button class="btn btn-primary btn-sm" onclick="showToast('去缴费')">去缴费</button></div></div></div>
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月20日 周四</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">经营贷还款</span><span class="timeline-item-amount">¥22,400</span></div><div class="loan-metrics"><div class="loan-metric"><span class="loan-metric-label">期数</span><span class="loan-metric-value">第8/12期</span></div><div class="loan-metric"><span class="loan-metric-label">年化利率</span><span class="loan-metric-value">4.35%</span></div><div class="loan-metric"><span class="loan-metric-label">剩余本金</span><span class="loan-metric-value">¥89,600</span></div></div><div class="timeline-item-actions"><button class="btn btn-secondary btn-sm" onclick="showToast('提前还款')">提前还款</button><button class="btn btn-primary btn-sm" onclick="showToast('已设置提醒')">按时还</button></div></div></div>
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月21日 周五</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">员工工资</span><span class="timeline-item-amount">¥52,300</span></div><div class="employee-avatars"><div class="employee-avatar">武强</div><div class="employee-avatar">智勇</div><div class="employee-avatar">陈刚</div><div class="employee-avatar">赵慧</div><div class="employee-avatar">其树</div><div class="employee-avatar">清</div></div><div class="timeline-item-actions"><button class="btn btn-primary btn-sm" onclick="showToast('代发薪')">发工资</button></div></div></div>`,
+    insights: `
+      <div class="section-title"><img src="../AI.png" alt="">根据您的生意情况，猜您关注</div>
+      <div class="insight-card" id="insightPrice"><div class="insight-title">瓶装水和茶饮进价在涨</div><div class="insight-desc">近 30 天批发参考价都有小幅上调。去年6月你这两类进货明显增加，如果本周供应商还有旧价，可以先囤一部分货。</div><div class="mini-metrics"><div class="mini-metric"><span class="mini-metric-label">550ml 瓶装水</span><span class="mini-metric-value">+4.8%</span><span class="mini-metric-note">近30天批发参考价</span></div><div class="mini-metric"><span class="mini-metric-label">即饮茶</span><span class="mini-metric-value">+3.2%</span><span class="mini-metric-note">近30天批发参考价</span></div></div><button class="insight-source" onclick="openSheet('evidencePrice')"><span>来源：快消品批发价观察网、付款记录</span><span class="insight-source-arrow">›</span></button></div>
+      <div class="insight-card"><div class="insight-title">端午前后，注意现金流</div><div class="insight-desc">你去年节假日前一周付款和临时支出都变多。今年端午临近，建议预留10万元开支资金。</div><div class="mini-metrics"><div class="mini-metric"><span class="mini-metric-label">供应商付款</span><span class="mini-metric-value">+26%</span><span class="mini-metric-note">去年端午前7天</span></div><div class="mini-metric"><span class="mini-metric-label">客户回款</span><span class="mini-metric-value">晚1.4天</span><span class="mini-metric-note">去年节前平均</span></div></div><button class="insight-source" onclick="openSheet('evidenceHoliday')"><span>来源：中国政府网节假日日历、收付款记录</span><span class="insight-source-arrow">›</span></button></div>
+      <div class="insight-card"><div class="insight-title">暑期临时用工成本会增加</div><div class="insight-desc">你去年 6 月下旬到 8 月，临时工资和配送补贴支出明显增加。近期同城短工日薪最近也有小幅上涨。</div><div class="mini-metrics"><div class="mini-metric"><span class="mini-metric-label">临时工资/补贴</span><span class="mini-metric-value">+18%</span><span class="mini-metric-note">去年暑期比平时</span></div><div class="mini-metric"><span class="mini-metric-label">同城短工日薪</span><span class="mini-metric-value">+5%</span><span class="mini-metric-note">近30天公开招聘价</span></div></div><button class="insight-source" onclick="openSheet('evidenceLabor')"><span>来源：工资/补贴支出、58同城短工薪资样本</span><span class="insight-source-arrow">›</span></button></div>`,
+    evidence: {
+      price: [
+        ['快消品批发价观察网', '瓶装水 +4.8%'],
+        ['快消品批发价观察网', '即饮茶 +3.2%'],
+        ['你的历史付款记录', '去年6-8月饮料付款 +32%'],
+        ['你给精海粮油的付款记录', '近3次饮料付款金额上升']
+      ],
+      priceNote: '价格变化来自公开批发价样本，进货变化来自你的银行付款记录。该提醒只用于备货参考，不代表价格一定继续上涨。',
+      holiday: [
+        ['中国政府网节假日日历', '端午临近'],
+        ['你的供应商付款记录', '去年端午前7天 +26%'],
+        ['你的客户收款记录', '去年节前平均晚1.4天'],
+        ['本周资金安排', '更适合短放、快取回']
+      ],
+      holidayNote: '节假日来自公开日历，付款和回款变化来自你的历史交易记录。该提醒用于现金留存参考。',
+      labor: [
+        ['你的工资/补贴支出', '去年暑期 +18%'],
+        ['你的转账备注记录', '去年暑期相关支出4笔'],
+        ['58同城短工薪资样本', '近30天 +5%'],
+        ['经营场景匹配', '饮料、冰品配送增加']
+      ],
+      laborNote: '用工支出来自你的银行交易和转账备注，短工价格来自公开招聘样本。该提醒仅用于提前预留人工支出。'
+    }
+  },
+  restaurant: {
+    summary: '李老板下午好。最近外卖平台收单金额持续下降，您需要关注一下是否投流出现了问题。今日气温高达38度，建议小店增加冰柠檬水、冰可乐的供应。',
+    flow: {
+      inTotal: '¥36,800',
+      pool: '¥42,300',
+      outTotal: '¥48,400',
+      inItems: [['堂食扫码', '¥18,600'], ['外卖平台结算', '¥12,400'], ['团购核销', '¥5,800']],
+      outItems: [['食材采购', '¥8,600'], ['房租', '¥18,000'], ['员工工资', '¥16,500'], ['水电/平台费', '¥5,300']],
+      balanceLabels: ['4.2万', '3.4万', '4.6万', '2.8万', '3.9万', '', '4.1万']
+    },
+    actions: `
+      <div class="action-section-header"><span style="font-size:15px;font-weight:600;">今日关注(1)</span><button class="week-overview-link" onclick="openSheet('weekOverview')">本周资金概览</button></div>
+      <div class="action-card" id="action3"><div class="action-card-header"><div class="action-title">今日外卖投流需增加 <span style="color:var(--primary);">¥680</span></div></div><div class="action-desc">明天迎来周末，外卖投流消耗量会比工作日多。建议多在外卖后台充值余额。</div><div class="mini-metrics"><div class="mini-metric"><span class="mini-metric-label">预计需多消耗</span><span class="mini-metric-value">¥680</span><span class="mini-metric-note">周末</span></div><div class="mini-metric"><span class="mini-metric-label">预计新增单量</span><span class="mini-metric-value">+100单</span><span class="mini-metric-note">单均约 ¥75</span></div></div><div class="action-buttons"><button class="btn btn-primary btn-sm" onclick="showToast('预算已调整')">调整预算</button></div></div>`,
+    timeline: `
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月17日 周一</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">采购肉菜米面</span><span class="timeline-item-amount">¥8,600</span></div><div class="account-info-row"><div class="account-bank"><span>按周一采购习惯生成</span></div></div><div class="timeline-item-actions"><button class="btn btn-primary btn-sm" onclick="showToast('已生成采购单')">生成采购单</button></div></div></div>
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月18日 周二</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">外卖投流预算</span><span class="timeline-item-amount">¥680</span></div><div class="account-info-row"><div class="account-bank"><span>建议先集中午高峰</span></div></div><div class="timeline-item-actions"><button class="btn btn-primary btn-sm" onclick="showToast('预算已调整')">调整预算</button></div></div></div>
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月19日 周三</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">外卖平台固定结算</span><span class="timeline-item-amount">¥12,400</span></div><div class="account-info-row"><div class="account-bank"><span>按平台规则到账，不可提前</span></div></div><div class="timeline-item-actions"><button class="btn btn-primary btn-sm" onclick="showToast('结算明细')">看结算明细</button></div></div></div>
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月21日 周五</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">店铺房租</span><span class="timeline-item-amount">¥18,000</span></div><div class="account-info-row"><div class="account-bank"><span>已计入周三平台结算后余额</span></div></div><div class="timeline-item-actions"><button class="btn btn-primary btn-sm" onclick="showToast('已设置提醒')">设提醒</button></div></div></div>
+      <div class="timeline-group"><div class="timeline-date-dot"></div><div class="timeline-date">3月23日 周日</div><div class="timeline-item"><div class="timeline-item-row"><span class="timeline-item-title">平台服务费</span><span class="timeline-item-amount">¥2,100</span></div><div class="account-info-row"><div class="account-bank"><span>美团/饿了么扣费预估</span></div></div><div class="timeline-item-actions"><button class="btn btn-primary btn-sm" onclick="showToast('扣费明细')">看明细</button></div></div></div>`,
+    insights: `
+      <div class="section-title"><img src="../AI.png" alt="">根据您的生意情况，猜您关注</div>
+      <div class="insight-card" id="insightPrice"><div class="insight-title">未来雨天有雨，外卖单量会增加</div><div class="insight-desc">明后天可以多备外卖爆款，少备堂食慢销品。</div><div class="mini-metrics"><div class="mini-metric"><span class="mini-metric-label">雨天外卖</span><span class="mini-metric-value">+22%</span><span class="mini-metric-note">去年雨天均值</span></div><div class="mini-metric"><span class="mini-metric-label">堂食收款</span><span class="mini-metric-value">-15%</span><span class="mini-metric-note">去年雨天均值</span></div></div><button class="insight-source" onclick="openSheet('evidencePrice')"><span>来源：中国天气网、收款记录</span><span class="insight-source-arrow">›</span></button></div>
+      <div class="insight-card"><div class="insight-title">投流别全天开，午高峰更划算</div><div class="insight-desc">近 7 天外卖投流里，午高峰单均获客成本低于晚高峰。今天建议把预算先放在 11:00-13:00。</div><div class="mini-metrics"><div class="mini-metric"><span class="mini-metric-label">午高峰获客</span><span class="mini-metric-value">¥42/单</span><span class="mini-metric-note">近7天均值</span></div><div class="mini-metric"><span class="mini-metric-label">晚高峰获客</span><span class="mini-metric-value">¥75/单</span><span class="mini-metric-note">近7天均值</span></div></div><button class="insight-source" onclick="openSheet('evidenceHoliday')"><span>来源：外卖平台扣费、订单收款时段</span><span class="insight-source-arrow">›</span></button></div>
+      <div class="insight-card"><div class="insight-title">燃气费最近偏高</div><div class="insight-desc">本月燃气费比上月同期高，堂食恢复是原因之一。晚市备餐可以按预约量做，减少空烧和损耗。</div><div class="mini-metrics"><div class="mini-metric"><span class="mini-metric-label">燃气费</span><span class="mini-metric-value">+12%</span><span class="mini-metric-note">本月同比上月同期</span></div><div class="mini-metric"><span class="mini-metric-label">堂食收款</span><span class="mini-metric-value">+9%</span><span class="mini-metric-note">本月同比上月同期</span></div></div><button class="insight-source" onclick="openSheet('evidenceLabor')"><span>来源：燃气缴费记录、堂食收款记录</span><span class="insight-source-arrow">›</span></button></div>`,
+    evidence: {
+      price: [
+        ['中国天气网', '未来两天有雨'],
+        ['你的外卖平台收款记录', '去年雨天外卖收款 +22%'],
+        ['你的堂食扫码收款记录', '去年雨天堂食收款 -15%'],
+        ['你的菜品收款结构', '盖浇饭、汤面类雨天更稳']
+      ],
+      priceNote: '天气来自公开预报，收款结构来自你的历史收单和平台结算记录。该提醒用于备货参考。',
+      holiday: [
+        ['外卖平台扣费记录', '午高峰获客约 ¥42/单'],
+        ['外卖平台扣费记录', '晚高峰获客约 ¥75/单'],
+        ['订单收款时段', '11:00-13:00 转化更稳'],
+        ['近7天投流记录', '晚餐时段花费上升但新增订单有限']
+      ],
+      holidayNote: '投流数据来自平台扣费和订单收款时段。建议仅用于预算分配参考。',
+      labor: [
+        ['燃气缴费记录', '本月比上月同期 +12%'],
+        ['堂食扫码收款记录', '本月比上月同期 +9%'],
+        ['店内预约/收款记录', '晚市堂食恢复'],
+        ['经营场景匹配', '备餐量增加会推高燃气支出']
+      ],
+      laborNote: '能耗变化来自缴费记录，堂食变化来自收款记录。该提醒用于控制备餐和损耗。'
+    }
+  }
+};
+
+function getCopyValue(path) {
+  return path.split('.').reduce((value, key) => value && value[key], COMMON_COPY);
+}
+
+function applyCommonCopy() {
+  document.querySelectorAll('[data-copy]').forEach(element => {
+    const value = getCopyValue(element.dataset.copy);
+    if (value !== undefined) element.textContent = value;
+  });
+  document.querySelectorAll('[data-copy-aria]').forEach(element => {
+    const value = getCopyValue(element.dataset.copyAria);
+    if (value !== undefined) element.setAttribute('aria-label', value);
+  });
+  document.querySelectorAll('[data-copy-value]').forEach(element => {
+    const value = getCopyValue(element.dataset.copyValue);
+    if (value !== undefined) element.value = value;
+  });
+}
+
+let weekSummaryTimers = [];
+
+function renderWeekSummary(animate) {
+  const summaryText = document.getElementById('weekSummaryText');
+  if (!summaryText) return;
+  weekSummaryTimers.forEach(timer => clearTimeout(timer));
+  weekSummaryTimers = [];
+  const text = summaryText.dataset.text || '';
+  if (!animate) {
+    summaryText.textContent = text;
+    return;
+  }
+  let index = 0;
+  summaryText.innerHTML = '<span class="week-summary-cursor"></span>';
+
+  function tick() {
+    const visible = text.slice(0, index);
+    const cursor = index < text.length ? '<span class="week-summary-cursor"></span>' : '';
+    summaryText.innerHTML = visible + cursor;
+    if (index < text.length) {
+      index += 1;
+      weekSummaryTimers.push(setTimeout(tick, 38));
+    }
+  }
+
+  weekSummaryTimers.push(setTimeout(tick, 180));
+}
+
+function renderRows(rows) {
+  return rows.map(row => '<div class="sheet-row"><span class="sheet-row-label">' + row[0] + '</span><span class="sheet-row-value">' + row[1] + '</span></div>').join('');
+}
+
+function setEvidence(sheetId, rows, note) {
+  const sheet = document.getElementById('sheet-' + sheetId);
+  if (!sheet) return;
+  const section = sheet.querySelector('.sheet-section');
+  const noteEl = sheet.querySelector('.sheet-note');
+  if (section) section.innerHTML = renderRows(rows);
+  if (noteEl) noteEl.textContent = note;
+}
+
+function applyMerchantRole(role) {
+  const content = ROLE_CONTENT[role] || ROLE_CONTENT.supplier;
+  const summaryText = document.getElementById('weekSummaryText');
+  if (summaryText) {
+    summaryText.dataset.text = content.summary;
+    renderWeekSummary(!document.body.classList.contains('intro-on'));
+  }
+
+  const inTotal = document.querySelector('.flow-col.in .flow-col-total');
+  const outTotal = document.querySelector('.flow-col.out .flow-col-total');
+  const poolAmount = document.querySelector('.flow-pool-amt');
+  if (inTotal) inTotal.textContent = content.flow.inTotal;
+  if (outTotal) outTotal.textContent = content.flow.outTotal;
+  if (poolAmount) poolAmount.textContent = content.flow.pool;
+
+  document.querySelectorAll('.flow-col.in .flow-card').forEach((card, index) => {
+    const item = content.flow.inItems[index];
+    if (!item) return;
+    card.querySelector('.fc-name').textContent = item[0];
+    card.querySelector('.fc-amt').textContent = item[1];
+  });
+  document.querySelectorAll('.flow-col.out .flow-card').forEach((card, index) => {
+    const item = content.flow.outItems[index];
+    if (!item) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = '';
+    card.querySelector('.fc-name').textContent = item[0];
+    card.querySelector('.fc-amt').textContent = item[1];
+  });
+
+  document.querySelectorAll('.bc-point-label').forEach((label, index) => {
+    label.textContent = content.flow.balanceLabels[index] || '';
+  });
+
+  const actions = document.querySelector('[data-step="step-2"]');
+  const weekOverview = document.getElementById('weekOverviewContent');
+  const insights = document.querySelector('[data-step="step-4"]');
+  if (actions) actions.innerHTML = content.actions;
+  if (weekOverview) weekOverview.innerHTML = content.timeline;
+  if (insights) insights.innerHTML = content.insights;
+
+  setEvidence('evidencePrice', content.evidence.price, content.evidence.priceNote);
+  setEvidence('evidenceHoliday', content.evidence.holiday, content.evidence.holidayNote);
+  setEvidence('evidenceLabor', content.evidence.labor, content.evidence.laborNote);
+
+  document.querySelectorAll('.role-option').forEach(button => {
+    button.classList.toggle('active', button.dataset.role === role);
+  });
+}
+
+applyCommonCopy();
+applyMerchantRole('supplier');
+
+document.addEventListener('click', event => {
+  const button = event.target.closest('.role-option');
+  if (!button) return;
+  applyMerchantRole(button.dataset.role);
+});
+
+// ===== INTRO → ENTER (no fade, click to enter) =====
+(function() {
+  const introBtn = document.getElementById('introEnterBtn');
+  const introPage = document.getElementById('introPage');
+  const introVisual = document.getElementById('introVisual');
+  const prevBtn = document.getElementById('introPrevBtn');
+  const nextBtn = document.getElementById('introNextBtn');
+  const dots = Array.from(document.querySelectorAll('.intro-dot'));
+  const slides = ['intro-shots/no1.png', 'intro-shots/no2.png', 'intro-shots/no3.png', 'intro-shots/no4.png'];
+  let index = 0;
+
+  if (!introBtn || !introPage) return;
+
+  function renderIntroSlide() {
+    if (introVisual) introVisual.src = slides[index];
+    if (prevBtn) prevBtn.disabled = index === 0;
+    if (nextBtn) nextBtn.disabled = index === slides.length - 1;
+    dots.forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === index));
+    introBtn.hidden = index !== slides.length - 1;
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function() {
+      index = Math.max(0, index - 1);
+      renderIntroSlide();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function() {
+      index = Math.min(slides.length - 1, index + 1);
+      renderIntroSlide();
+    });
+  }
+
+  document.addEventListener('keydown', function(event) {
+    if (introPage.style.display === 'none') return;
+    if (event.key === 'ArrowLeft') {
+      index = Math.max(0, index - 1);
+      renderIntroSlide();
+    }
+    if (event.key === 'ArrowRight') {
+      index = Math.min(slides.length - 1, index + 1);
+      renderIntroSlide();
+    }
+  });
+
+  introBtn.addEventListener('click', function() {
+    introPage.style.display = 'none';
+    document.body.classList.remove('intro-on');
+    document.body.scrollTop = 0;
+    renderWeekSummary(true);
+  });
+
+  renderIntroSlide();
+})();
+
+// ===== GUIDE: step selector + commentary, drives the phone =====
+(function() {
+  const guideSteps = document.getElementById('guideSteps');
+  const guidePanel = document.getElementById('guidePanel');
+  if (!guideSteps || !guidePanel) return;
+  const steps = Array.from(guideSteps.querySelectorAll('.guide-step'));
+  const phone = document.querySelector('.phone-frame');
+
+  // commentary for each step
+  const COPY = {
+    'step-1': {
+      title: '第一步：先把全局讲清楚',
+      points: [
+        '进入页面先看到本周资金判断，减少翻账户和查明细。',
+        '资金图把预计进账、现有资金、预计支出放在同一屏。',
+        '余额图标出最低点，让用户知道哪一天最需要留意。'
+      ]
+    },
+    'step-2': {
+      title: '第二步：把今天该处理的事挑出来',
+      points: [
+        '只展示会影响后续安排的事项，降低当天决策压力。',
+        '每张卡保留金额、对象、时间、账户这些关键信息。',
+        '客户回款加入历史习惯，帮助用户判断先联系谁。'
+      ]
+    },
+    'step-4': {
+      title: '第三步：看见更早一点的变化',
+      points: [
+        '用交易记录识别进货、工资、回款和缴费里的规律。',
+        '结合公开行业数据，给出备货、现金留存和用工提醒。',
+        '每条建议都提供来源，用户可以查看判断依据。'
+      ]
+    },
+    'step-value': {
+      title: '这个方案的价值',
+      rows: [
+        { label: '用户', text: '减少查找、记忆和理解成本。资金状态、关键事项和可执行动作放在一起，处理经营资金更快。' },
+        { label: '银行', text: '转账、理财、代发、缴费、贷款进入真实经营场景。服务触发来自用户当下的资金任务。' },
+        { label: '产品', text: '页面回答三个问题：<strong>现在发生了什么，今天要处理什么，下一步可以提前看什么</strong>。' }
+      ]
+    }
+  };
+
+  function render(step) {
+    const c = COPY[step];
+    if (!c) return;
+    if (c.rows) {
+      // value / thinking view
+      guidePanel.innerHTML =
+        '<div class="gp-title">' + c.title + '</div>' +
+        c.rows.map(function(r) {
+          return '<div class="gp-value-row"><div class="gp-value-label">' + r.label +
+                 '</div><div class="gp-value-text">' + r.text + '</div></div>';
+        }).join('');
+    } else if (c.points) {
+      // 要点列表（无图的 tab）
+      guidePanel.innerHTML =
+        '<div class="gp-title">' + c.title + '</div>' +
+        '<ul class="gp-points">' +
+        c.points.map(function(p) { return '<li>' + p + '</li>'; }).join('') +
+        '</ul>';
+    } else {
+      // step commentary view
+      guidePanel.innerHTML =
+        '<div class="gp-title">' + c.title + '</div>' +
+        '<div class="gp-text">' + c.role + '</div>' +
+        '<div class="gp-text">' + c.design + '</div>';
+    }
+    // re-trigger fade animation
+    guidePanel.style.animation = 'none';
+    void guidePanel.offsetWidth;
+    guidePanel.style.animation = '';
+  }
+
+  function setActive(step, scrollPhone) {
+    steps.forEach(s => s.classList.toggle('active', s.dataset.jump === step));
+    render(step);
+    if (scrollPhone && step.indexOf('value') === -1) {
+      const target = document.querySelector('[data-step="' + step + '"]');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // click a step → scroll phone + switch commentary (value tab doesn't scroll phone)
+  steps.forEach(s => {
+    s.addEventListener('click', function() {
+      setActive(s.dataset.jump, s.dataset.jump.indexOf('value') === -1);
+    });
+  });
+
+  // scroll phone → update active step (phone scrolls inside .phone-frame)
+  if ('IntersectionObserver' in window && phone) {
+    const anchors = Array.from(document.querySelectorAll('[data-step]'));
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const step = entry.target.dataset.step;
+          steps.forEach(s => s.classList.toggle('active', s.dataset.jump === step));
+          render(step);
+        }
+      });
+    }, { root: phone, rootMargin: '-90px 0px -55% 0px', threshold: 0 });
+    anchors.forEach(a => observer.observe(a));
+  }
+
+  // initial render
+  setActive('step-1', false);
+})();
+
+// Sheet management
+let activeSheet = null;
+let executionTimer = null;
+
+function openSheet(id) {
+  if (activeSheet) closeSheet(false);
+  const sheet = document.getElementById('sheet-' + id);
+  const overlay = document.getElementById('overlay');
+  if (!sheet) return;
+  sheet.classList.add('show');
+  overlay.classList.add('show');
+  activeSheet = id;
+  if (id === 'executionProcess') resetExecutionProcess();
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSheet(animate = true) {
+  if (!activeSheet) return;
+  if (activeSheet === 'executionProcess' && executionTimer) {
+    clearTimeout(executionTimer);
+    executionTimer = null;
+  }
+  const sheet = document.getElementById('sheet-' + activeSheet);
+  const overlay = document.getElementById('overlay');
+  if (sheet) sheet.classList.remove('show');
+  overlay.classList.remove('show');
+  activeSheet = null;
+  document.body.style.overflow = '';
+}
+
+// Map view switching
+function switchMapView(view, el) {
+  document.querySelectorAll('.map-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const tabs = document.querySelector('.map-tabs');
+  tabs.classList.remove('show-left', 'show-right');
+  tabs.classList.add(view === 'flow' ? 'show-left' : 'show-right');
+  document.getElementById('flowView').style.display = view === 'flow' ? 'block' : 'none';
+  document.getElementById('balanceView').style.display = view === 'balance' ? 'block' : 'none';
+}
+
+// Mark action as done
+function markDone(id, btn) {
+  btn.textContent = COMMON_COPY.interactions.done;
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  updateActionProgress();
+}
+
+function updateActionProgress() {
+  const total = document.querySelectorAll('.action-card').length;
+  const done = document.querySelectorAll('.action-card.done').length;
+  const indicator = document.querySelector('.content > div:nth-child(6) span:last-child');
+  if (indicator) indicator.textContent = done + '/' + total;
+}
+
+function toggleCollections(btn) {
+  const details = btn.closest('.collection-details');
+  details.classList.toggle('expanded');
+  btn.firstChild.textContent = details.classList.contains('expanded')
+    ? COMMON_COPY.interactions.collapse
+    : COMMON_COPY.interactions.expand;
+}
+
+const LEGACY_PAGES = {
+  home: 'legacy-shots/shouye.png',
+  receivable: 'legacy-shots/chahuikuan.png',
+  payment: 'legacy-shots/yuefukuan.png',
+  salary: 'legacy-shots/kangongzi.png',
+  cash: 'legacy-shots/fangxianqian.png',
+  analysis: 'legacy-shots/no.png',
+  stockup: 'legacy-shots/no.png'
+};
+
+function renderLegacyPage(key) {
+  const page = LEGACY_PAGES[key] || LEGACY_PAGES.home;
+  const el = document.getElementById('legacyShot');
+  if (!el) return;
+  el.src = page;
+}
+
+function hideCompareCallout() {
+  const callout = document.getElementById('compareCallout');
+  if (callout) callout.classList.remove('show');
+}
+
+function positionCompareCallout(target) {
+  const callout = document.getElementById('compareCallout');
+  const stagePhone = document.querySelector('.stage-phone');
+  if (!callout || !stagePhone || !target) return;
+
+  const stageRect = stagePhone.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  callout.style.top = (targetRect.top - stageRect.top - 10) + 'px';
+  callout.style.height = (targetRect.height + 20) + 'px';
+  callout.classList.add('show');
+}
+
+function highlightFundMap(key) {
+  hideCompareCallout();
+  if (key !== 'salary') closeSheet(false);
+
+  const phone = document.querySelector('.phone-frame');
+  if (key === 'home') {
+    if (phone) phone.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  let target = null;
+  if (key === 'receivable') target = document.getElementById('action1');
+  if (key === 'payment') target = document.getElementById('action2');
+  if (key === 'cash') target = document.getElementById('action3');
+  if (key === 'analysis') target = document.getElementById('businessChange');
+  if (key === 'stockup') target = document.getElementById('insightPrice');
+
+  if (key === 'salary') {
+    openSheet('weekOverview');
+    return;
+  }
+
+  if (target && phone) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => positionCompareCallout(target), 260);
+  }
+}
+
+document.querySelectorAll('.compare-node').forEach(node => {
+  node.addEventListener('click', () => {
+    const key = node.dataset.compare;
+    document.querySelectorAll('.compare-node').forEach(item => item.classList.toggle('active', item === node));
+    renderLegacyPage(key);
+    highlightFundMap(key);
+  });
+});
+
+function updateChangeDots(carousel, index) {
+  carousel.querySelectorAll('.change-dot').forEach((dot, dotIndex) => {
+    dot.classList.toggle('active', dotIndex === index);
+  });
+}
+
+function nextChangeSlide(button) {
+  const carousel = button.closest('.change-carousel');
+  const track = carousel && carousel.querySelector('.change-track');
+  if (!track) return;
+  const total = track.children.length;
+  const height = track.clientHeight;
+  const current = Math.round(track.scrollTop / height);
+  const next = (current + 1) % total;
+  track.scrollTo({ top: next * height, behavior: 'smooth' });
+  updateChangeDots(carousel, next);
+}
+
+document.querySelectorAll('.change-carousel').forEach(carousel => {
+  const track = carousel.querySelector('.change-track');
+  if (!track) return;
+  track.addEventListener('scroll', () => {
+    const height = track.clientHeight || 1;
+    const index = Math.round(track.scrollTop / height);
+    updateChangeDots(carousel, index);
+  }, { passive: true });
+});
+
+// Execution process
+function resetExecutionProcess() {
+  const sheet = document.getElementById('sheet-executionProcess');
+  if (!sheet) return;
+  sheet.querySelector('.sheet-title').textContent = COMMON_COPY.execution.activeTitle;
+  sheet.querySelectorAll('.execution-step').forEach(step => step.classList.remove('running', 'done'));
+  const btn = document.getElementById('executionBtn');
+  btn.textContent = COMMON_COPY.execution.idleButton;
+  btn.disabled = false;
+  btn.classList.remove('loading');
+  btn.onclick = startExecutionProcess;
+  if (executionTimer) {
+    clearTimeout(executionTimer);
+    executionTimer = null;
+  }
+}
+
+function startExecutionProcess() {
+  const sheet = document.getElementById('sheet-executionProcess');
+  const steps = Array.from(sheet.querySelectorAll('.execution-step'));
+  const btn = document.getElementById('executionBtn');
+  let index = 0;
+
+  btn.textContent = COMMON_COPY.execution.runningButton;
+  btn.disabled = true;
+  btn.classList.add('loading');
+  steps.forEach(step => step.classList.remove('running', 'done'));
+
+  function runNext() {
+    if (index > 0) steps[index - 1].classList.add('done');
+    if (index >= steps.length) {
+      executionTimer = null;
+      openSheet('purchaseDone');
+      return;
+    }
+    steps[index].classList.add('running');
+    executionTimer = setTimeout(() => {
+      steps[index].classList.remove('running');
+      index += 1;
+      runNext();
+    }, 700);
+  }
+
+  runNext();
+}
+
+// Toast
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+}
+
+// Close sheet on ESC
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSheet();
+});
+</script>
+
+</body>
+</html>

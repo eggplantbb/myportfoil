@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "HYLiLiangHeiJ";
+  src: url('/fonts/hy-li-liang-hei-jian.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
   color: #2f2725;
@@ -14,7 +22,7 @@
 
 body {
   margin: 0;
-  min-width: 1440px;
+  min-width: 0;
   cursor: url('/cursors/black_pencil_cursor.cur') 10 10, default;
 }
 
@@ -35,9 +43,14 @@ button {
 
 .app-shell {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   isolation: isolate;
   min-height: 100vh;
-  padding: 132px 0 12px;
+  height: 100vh;
+  padding: 16px;
+  overflow: hidden;
   background: transparent;
 }
 
@@ -51,11 +64,15 @@ button {
 }
 
 .app-shell.is-detail-mode {
+  display: block;
+  height: auto;
   padding: 0;
+  overflow: visible;
   background: none;
 }
 
 .app-shell.is-cover-mode {
+  display: block;
   padding: 0;
 }
 
@@ -166,6 +183,21 @@ button {
   -webkit-user-drag: none;
 }
 
+.envelope-stage.is-revealed .envelope-booklet-card:not(.is-dragging) img {
+  animation: booklet-float 1600ms ease-in-out infinite;
+}
+
+@keyframes booklet-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 .envelope-image-front {
   position: absolute;
   inset: 0;
@@ -229,9 +261,21 @@ button {
 
 @media (prefers-reduced-motion: reduce) {
   .envelope-stage.is-opening .envelope-image-closed,
-  .envelope-stage.is-entering .envelope-revealed-booklet {
+  .envelope-stage.is-entering .envelope-revealed-booklet,
+  .envelope-stage.is-revealed .envelope-booklet-card img {
     animation-duration: 1ms;
   }
+}
+
+.home-fit-frame {
+  position: relative;
+  flex: none;
+}
+
+.home-booklet {
+  width: 1280px;
+  height: 874px;
+  transform-origin: top left;
 }
 
 .booklet-header {
@@ -315,7 +359,8 @@ button {
 }
 
 .tab-label-cjk {
-  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: "HYLiLiangHeiJ", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-weight: 400;
 }
 
 .main-stage {
@@ -527,19 +572,23 @@ button {
 }
 
 .ai-image-placeholder {
-  padding: 12px;
-  border: 2px dashed rgba(47, 39, 37, 0.32);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.36);
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .ai-image-placeholder .collage-placeholder {
   border-radius: 8px;
 }
 
+.ai-image-placeholder .collage-image {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+
 .ai-image-placeholder .collage-content {
-  padding-top: 8px;
-  text-align: center;
+  display: none;
 }
 
 .ai-image-placeholder .collage-content strong {
@@ -607,7 +656,12 @@ button {
   margin: 0 auto;
   background: #ffffff;
   overflow: auto;
+  scrollbar-width: none;
   box-shadow: 0 24px 60px rgba(73, 57, 39, 0.12);
+}
+
+.immersive-body::-webkit-scrollbar {
+  display: none;
 }
 
 .project-image-stack {
@@ -627,6 +681,31 @@ button {
   height: 100%;
   border: 0;
   background: #ffffff;
+}
+
+.project-hkbAI.immersive-project-view {
+  padding: 28px 0 24px;
+}
+
+.project-hkbAI .immersive-header {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  left: 24px;
+  width: auto;
+  margin: 0;
+}
+
+.project-hkbAI .immersive-body {
+  width: min(1760px, calc(100vw - 96px));
+  height: calc(100vh - 52px);
+  background: transparent;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.project-hkbAI .project-html-frame {
+  background: transparent;
 }
 
 .modal-backdrop {
@@ -655,7 +734,14 @@ button {
 
 .showcase-modal-wide {
   width: 800px;
-  min-height: 430px;
+  min-width: 800px;
+  max-width: 800px;
+  height: 620px;
+  min-height: 620px;
+  max-height: 620px;
+  flex-shrink: 0;
+  padding: 24px;
+  overflow: hidden;
 }
 
 .showcase-modal-body {
@@ -665,6 +751,11 @@ button {
   justify-content: center;
   gap: 16px;
   width: 100%;
+}
+
+.showcase-modal-wide .showcase-modal-body {
+  height: 100%;
+  justify-content: center;
 }
 
 .showcase-modal h2 {
@@ -687,6 +778,13 @@ button {
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
+}
+
+.showcase-modal-close img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .qr-placeholder {
@@ -722,20 +820,32 @@ button {
 }
 
 .product-modal-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-rows: 346px 30px 78px 24px;
+  justify-items: center;
+  align-content: center;
   width: 100%;
-  gap: 14px;
-  padding: 18px;
+  height: 100%;
+  gap: 16px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.product-modal-media {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 346px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .product-modal-image-placeholder {
   display: grid;
   place-items: center;
   width: 100%;
-  max-width: 484px;
-  height: 250px;
+  height: 100%;
   border-radius: 16px;
   background:
     linear-gradient(135deg, rgba(242, 155, 212, 0.18), rgba(255, 255, 255, 1)),
@@ -753,14 +863,21 @@ button {
 
 .product-modal-image {
   display: block;
-  width: auto;
-  max-width: 100%;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  object-position: center;
 }
 
 .product-modal-content h2 {
-  margin: 2px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
   width: 100%;
+  height: 30px;
   font-size: 24px;
   line-height: 1.2;
   text-align: center;
@@ -770,11 +887,21 @@ button {
   margin: 0;
   width: 100%;
   max-width: 484px;
+  height: 78px;
   font-size: 16px;
   line-height: 1.6;
   color: rgba(47, 39, 37, 0.68);
   text-align: left;
   white-space: normal;
+  overflow: hidden;
+}
+
+.product-modal-link-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 24px;
 }
 
 .product-modal-link,

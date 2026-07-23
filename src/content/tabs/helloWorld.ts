@@ -51,6 +51,18 @@ export const helloWorldTab: TabDefinition = {
       hoverEffect: 'breathe',
       className: 'floating-cutout',
     },
+    //公司logo
+    {
+      id: 'group',
+      imageSrc: '/assets/tiezhi/1-group.png',
+      x: 40,
+      y: 700,
+      width: 100,
+      zIndex: 4,
+      rotate: 0,
+      hoverEffect: 'breathe',
+      className: 'floating-cutout',
+    },
     // 微信贴纸，点击后打开二维码弹窗
     {
       id: 'wechat',
@@ -69,7 +81,7 @@ export const helloWorldTab: TabDefinition = {
     {
       id:'myname' ,
       imageSrc: '/assets/tiezhi/1-name.png',
-      x: 403,
+      x: 423,
       y: 280,
       width: 300,
       zIndex: 4,
@@ -79,9 +91,9 @@ export const helloWorldTab: TabDefinition = {
     // 中间的自我介绍文本
     {
       id: 'intro-note',
-      body: '2022年从浙大毕业，加入蚂蚁成为体验设计师，近4年的时间一致围绕金融业务做设计。\n\n2026年初我获得一个难得的机会回到家乡福州，体验了近半年更稳定的工作状态。但我发现自己还是更喜欢创造性的工作、靠近真实市场、产品变化和技术变化的环境。\n\n所以现在我重新开始看机会。希望有机会和你聊聊～',
-      x: 403,
-      y: 409,
+      body: '2022年从浙大毕业，加入蚂蚁成为体验设计师，近4年的时间一致围绕特色客群的金融业务做设计和用户研究。\n\n现在也在做部门内AI native的尝试，和开发了一些小工具、小产品。不断探索和AI的协作方式，过程中也帮助认识自己。\n\n感兴趣的话和我聊聊吧～',
+      x: 423,
+      y: 400,
       width: 399,
       height: 195,
       className: 'plain-copy',
@@ -116,9 +128,9 @@ export const helloWorldTab: TabDefinition = {
       imageSrc: '/assets/tiezhi/1-terminal.png',
       x: 36,
       y: 520,
-      width: 289,
+      width: 300,
       height: 178,
-      rotate: 5,
+      rotate: -3,
       zIndex: 3,
       hoverEffect: 'breathe',
       className: 'floating-cutout',
