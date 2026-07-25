@@ -17,6 +17,18 @@ function hasChinese(text: string) {
   return /[\u4e00-\u9fff]/.test(text);
 }
 
+function getLabelClass(tab: TabDefinition) {
+  if (hasChinese(tab.label)) {
+    return 'tab-label-cjk';
+  }
+
+  if (tab.id === 'hello-world') {
+    return 'tab-label-latin';
+  }
+
+  return '';
+}
+
 function TabShape({ active, color }: { active: boolean; color: string }) {
   const width = active ? 320 : 150;
   const height = active ? 63 : 42;
@@ -52,7 +64,7 @@ export function TabBar({ tabs, activeTabId, onChange }: TabBarProps) {
             onClick={() => onChange(tab.id)}
           >
             <TabShape active={isActive} color={fillColor} />
-            <span className={`tab-label ${hasChinese(tab.label) ? 'tab-label-cjk' : ''}`}>
+            <span className={`tab-label ${getLabelClass(tab)}`}>
               {tab.label}
             </span>
           </button>
