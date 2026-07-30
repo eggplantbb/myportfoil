@@ -3,7 +3,8 @@ export type ProductModalId = 'codex' | 'book' | 'map' | 'jinyong' | 'write';
 export type ItemAction =
   | { type: 'openProject'; projectId: string }
   | { type: 'openModal'; id: ProductModalId }
-  | { type: 'openWechat' };
+  | { type: 'openWechat' }
+  | { type: 'openTerminalProfile' };
 
 export type CollageItemData = {
   id: string;

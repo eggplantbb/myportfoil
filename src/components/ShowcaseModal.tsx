@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+
+const wechatId = 'eggplant_bb';
 
 type ShowcaseModalProps = {
   title: string;
@@ -22,6 +24,9 @@ export function ShowcaseModal({
   centerX,
   onClose,
 }: ShowcaseModalProps) {
+  const [copyToast, setCopyToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -30,8 +35,27 @@ export function ShowcaseModal({
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (toastTimerRef.current !== null) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+    };
   }, [onClose]);
+
+  const handleCopyWechatId = async () => {
+    try {
+      await navigator.clipboard.writeText(wechatId);
+      setCopyToast('已复制微信号');
+    } catch {
+      setCopyToast('复制失败，请手动复制');
+    }
+
+    if (toastTimerRef.current !== null) {
+      window.clearTimeout(toastTimerRef.current);
+    }
+    toastTimerRef.current = window.setTimeout(() => setCopyToast(null), 1800);
+  };
 
   const modalStyle: CSSProperties | undefined =
     centerX == null
@@ -90,9 +114,26 @@ export function ShowcaseModal({
                   <span>后续替换成你的二维码图片</span>
                 </div>
               )}
+              <div className="qr-account-row">
+                <span>{wechatId}</span>
+                <button
+                  type="button"
+                  className="qr-copy-button"
+                  onClick={handleCopyWechatId}
+                  aria-label="复制微信号"
+                  title="复制微信号"
+                >
+                  <span aria-hidden="true">⧉</span>
+                </button>
+              </div>
             </>
           )}
         </div>
+        {copyToast ? (
+          <div className="copy-toast" role="status" aria-live="polite">
+            {copyToast}
+          </div>
+        ) : null}
       </section>
     </div>
   );

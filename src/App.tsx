@@ -4,12 +4,13 @@ import { EnvelopeIntro } from './components/EnvelopeIntro';
 import { ImmersiveProjectView } from './components/ImmersiveProjectView';
 import { ShowcaseModal } from './components/ShowcaseModal';
 import { TabBar } from './components/TabBar';
+import { TerminalProfileModal } from './components/TerminalProfileModal';
 import { productModalContent } from './content/productModals';
 import { projectMap } from './content/projects';
 import { tabs } from './content/tabs';
 import type { CollageItemData, ProductModalId } from './types';
 
-type ActiveModal = { type: 'wechat' } | { type: 'product'; id: ProductModalId } | null;
+type ActiveModal = { type: 'wechat' } | { type: 'product'; id: ProductModalId } | { type: 'terminalProfile' } | null;
 
 const HOME_WIDTH = 1280;
 const HOME_HEIGHT = 874;
@@ -79,6 +80,12 @@ export default function App() {
     if (action.type === 'openModal') {
       setModalCenterX(getBookletCenterX());
       setActiveModal({ type: 'product', id: action.id });
+      return;
+    }
+
+    if (action.type === 'openTerminalProfile') {
+      setModalCenterX(getBookletCenterX());
+      setActiveModal({ type: 'terminalProfile' });
       return;
     }
 
@@ -163,6 +170,9 @@ export default function App() {
           centerX={modalCenterX}
           onClose={closeModal}
         />
+      ) : null}
+      {introComplete && activeModal?.type === 'terminalProfile' ? (
+        <TerminalProfileModal centerX={modalCenterX} onClose={closeModal} />
       ) : null}
     </div>
   );

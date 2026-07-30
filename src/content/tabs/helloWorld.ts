@@ -133,6 +133,7 @@ export const helloWorldTab: TabDefinition = {
       rotate: -3,
       zIndex: 3,
       hoverEffect: 'breathe',
+      action: { type: 'openTerminalProfile' },
       className: 'floating-cutout',
     },
   ],
