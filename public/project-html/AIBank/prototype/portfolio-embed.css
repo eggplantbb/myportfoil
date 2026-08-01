@@ -1,0 +1,8 @@
+body {
+  min-width: 0 !important;
+}
+
+.stage {
+  transform: scale(0.72);
+  transform-origin: center;
+}

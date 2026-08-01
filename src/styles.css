@@ -648,7 +648,7 @@ button {
 
 .immersive-header {
   display: flex;
-  width: 1282px;
+  width: min(1282px, calc((100vh - 157px) * 16 / 9), calc(100vw - 96px));
   margin: 0 auto 21px;
   align-items: center;
   justify-content: flex-start;
@@ -672,8 +672,8 @@ button {
 }
 
 .immersive-body {
-  width: 1282px;
-  height: calc(100vh - 157px);
+  width: min(1282px, calc((100vh - 157px) * 16 / 9), calc(100vw - 96px));
+  height: min(721px, calc(100vh - 157px), calc((100vw - 96px) * 9 / 16));
   margin: 0 auto;
   background: #ffffff;
   overflow: auto;

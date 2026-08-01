@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>资金地图 - 原型</title>
+<link rel="stylesheet" href="portfolio-embed.css">
 <style>
 @font-face {
   font-family: "AlibabaSansNumber";
@@ -4355,10 +4356,11 @@ function positionCompareCallout(target) {
   const stagePhone = document.querySelector('.stage-phone');
   if (!callout || !stagePhone || !target) return;
 
+  const embedScale = 0.72;
   const stageRect = stagePhone.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
-  callout.style.top = (targetRect.top - stageRect.top - 10) + 'px';
-  callout.style.height = (targetRect.height + 20) + 'px';
+  callout.style.top = (targetRect.top - stageRect.top - 10) / embedScale + 'px';
+  callout.style.height = (targetRect.height + 20) / embedScale + 'px';
   callout.classList.add('show');
 }
 
