@@ -904,15 +904,96 @@ button {
 }
 
 .product-modal-content {
-  display: grid;
-  grid-template-rows: 346px 30px 78px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   justify-items: center;
   align-content: center;
   width: 100%;
   height: 100%;
-  gap: 16px;
-  padding: 0;
+  gap: 20px;
+  box-sizing: border-box;
+  padding: 18px 32px 12px;
   overflow: hidden;
+}
+
+.writing-themes-content h2 {
+  flex: 0 0 auto;
+  width: 100%;
+  height: auto;
+  font-size: 28px;
+}
+
+.writing-themes-list {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-sizing: border-box;
+  padding: 2px 0 8px;
+}
+
+.writing-themes-list::-webkit-scrollbar {
+  display: none;
+}
+
+.writing-theme {
+  flex: 0 0 auto;
+  border-bottom: 1px solid rgba(47, 39, 37, 0.14);
+}
+
+.writing-theme-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: #2f2725;
+  font: inherit;
+  font-size: 17px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.writing-theme-trigger:hover {
+  color: #7561d5;
+}
+
+.writing-theme-trigger:focus-visible {
+  outline: 2px solid #7561d5;
+  outline-offset: 2px;
+}
+
+.writing-theme-icon {
+  display: block;
+  width: 9px;
+  height: 9px;
+  margin-right: 5px;
+  border-right: 1.5px solid rgba(47, 39, 37, 0.64);
+  border-bottom: 1.5px solid rgba(47, 39, 37, 0.64);
+  color: rgba(47, 39, 37, 0.58);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 160ms ease;
+}
+
+.writing-theme-icon.is-open {
+  transform: rotate(225deg) translate(-2px, -2px);
+}
+
+.writing-theme-content {
+  margin: 0;
+  padding: 0 0 16px;
+  color: rgba(47, 39, 37, 0.68);
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 .product-modal-media {
@@ -999,6 +1080,47 @@ button {
 .product-modal-link {
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+.writing-themes-content h2 {
+  height: auto;
+  font-size: 28px;
+}
+
+.writing-themes-content .writing-theme-content {
+  max-width: none;
+  height: auto;
+  overflow: visible;
+  text-align: left;
+}
+
+.writing-theme-content p {
+  width: 100%;
+  max-width: none;
+  height: auto;
+  overflow: visible;
+  margin: 0 0 12px;
+}
+
+.writing-theme-content p:last-child {
+  margin-bottom: 0;
+}
+
+.writing-theme-content strong {
+  color: #2f2725;
+  font-weight: 700;
+}
+
+.writing-theme-content .text-purple {
+  color: #7561d5;
+}
+
+.writing-theme-content .text-blue {
+  color: #3e78b8;
+}
+
+.writing-theme-content .text-green {
+  color: #4f8664;
 }
 
 .terminal-profile-modal {

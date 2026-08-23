@@ -5,7 +5,6 @@ import { ImmersiveProjectView } from './components/ImmersiveProjectView';
 import { ShowcaseModal } from './components/ShowcaseModal';
 import { TabBar } from './components/TabBar';
 import { TerminalProfileModal } from './components/TerminalProfileModal';
-import { productModalContent } from './content/productModals';
 import { projectMap } from './content/projects';
 import { tabs } from './content/tabs';
 import type { CollageItemData, ProductModalId } from './types';
@@ -49,7 +48,6 @@ export default function App() {
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
   const activeProject = activeProjectId ? projectMap.get(activeProjectId) ?? null : null;
-  const activeProductModal = activeModal?.type === 'product' ? productModalContent[activeModal.id] : null;
 
   const getBookletCenterX = () => {
     const tabBar = document.querySelector('.tab-bar')?.getBoundingClientRect();
@@ -159,14 +157,10 @@ export default function App() {
           onClose={closeModal}
         />
       ) : null}
-      {introComplete && activeModal?.type === 'product' && activeProductModal ? (
+      {introComplete && activeModal?.type === 'product' ? (
         <ShowcaseModal
           variant="product"
-          title={activeProductModal.title}
-          body={activeProductModal.body}
-          imageSrc={activeProductModal.imageSrc}
-          linkText={activeProductModal.linkText}
-          linkHref={activeProductModal.linkHref}
+          title="一些想法"
           centerX={modalCenterX}
           onClose={closeModal}
         />

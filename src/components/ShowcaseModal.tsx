@@ -1,15 +1,59 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { writingThemes } from '../content/writingThemes';
 
 const wechatId = 'eggplant_bb';
+
+const renderInlineWritingText = (text: string, keyPrefix: string) => {
+  const tokenPattern = /\*\*(.+?)\*\*|<span class="(text-[a-z-]+)">(.+?)<\/span>/g;
+  const nodes: JSX.Element[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let index = 0;
+
+  while ((match = tokenPattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      nodes.push(<Fragment key={`${keyPrefix}-text-${index}`}>{text.slice(lastIndex, match.index)}</Fragment>);
+      index += 1;
+    }
+
+    if (match[1]) {
+      nodes.push(<strong key={`${keyPrefix}-bold-${index}`}>{match[1]}</strong>);
+    } else if (match[2] && match[3]) {
+      nodes.push(
+        <span className={match[2]} key={`${keyPrefix}-color-${index}`}>
+          {match[3]}
+        </span>,
+      );
+    }
+
+    lastIndex = tokenPattern.lastIndex;
+    index += 1;
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(<Fragment key={`${keyPrefix}-text-${index}`}>{text.slice(lastIndex)}</Fragment>);
+  }
+
+  return nodes;
+};
+
+const renderWritingContent = (content: string) =>
+  content.split(/\n\s*\n/).map((paragraph, paragraphIndex) => (
+    <p key={`paragraph-${paragraphIndex}`}>
+      {paragraph.split('\n').map((line, lineIndex) => (
+        <Fragment key={`line-${paragraphIndex}-${lineIndex}`}>
+          {lineIndex > 0 ? <br /> : null}
+          {renderInlineWritingText(line, `line-${paragraphIndex}-${lineIndex}`)}
+        </Fragment>
+      ))}
+    </p>
+  ));
 
 type ShowcaseModalProps = {
   title: string;
   variant: 'qr' | 'product';
-  body?: string;
   imageSrc?: string;
-  linkText?: string;
-  linkHref?: string;
   centerX?: number | null;
   onClose: () => void;
 };
@@ -17,14 +61,12 @@ type ShowcaseModalProps = {
 export function ShowcaseModal({
   title,
   variant,
-  body,
   imageSrc,
-  linkText,
-  linkHref,
   centerX,
   onClose,
 }: ShowcaseModalProps) {
   const [copyToast, setCopyToast] = useState<string | null>(null);
+  const [openThemeId, setOpenThemeId] = useState<string | null>(null);
   const toastTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -57,6 +99,10 @@ export function ShowcaseModal({
     toastTimerRef.current = window.setTimeout(() => setCopyToast(null), 1800);
   };
 
+  const toggleTheme = (themeId: string) => {
+    setOpenThemeId((current) => (current === themeId ? null : themeId));
+  };
+
   const modalStyle: CSSProperties | undefined =
     centerX == null
       ? undefined
@@ -82,26 +128,30 @@ export function ShowcaseModal({
         </button>
         <div className="showcase-modal-body">
           {variant === 'product' ? (
-            <div className="product-modal-content">
-              <div className="product-modal-media">
-                {imageSrc ? (
-                  <img className="product-modal-image" src={imageSrc} alt={title} />
-                ) : (
-                  <div className="product-modal-image-placeholder" aria-hidden="true">
-                    <span>图片占位</span>
-                  </div>
-                )}
-              </div>
-              <h2>{title}</h2>
-              <p>{body}</p>
-              <div className="product-modal-link-slot">
-                {linkText && linkHref ? (
-                  <a className="product-modal-link" href={linkHref} target="_blank" rel="noreferrer">
-                    {linkText}
-                  </a>
-                ) : linkText ? (
-                  <span className="product-modal-note">{linkText}</span>
-                ) : null}
+            <div className="product-modal-content writing-themes-content">
+              <h2>一些想法</h2>
+              <div className="writing-themes-list">
+                {writingThemes.map((theme) => {
+                  const isOpen = openThemeId === theme.id;
+
+                  return (
+                    <article className={`writing-theme ${isOpen ? 'is-open' : ''}`} key={theme.id}>
+                      <button
+                        type="button"
+                        className="writing-theme-trigger"
+                        aria-expanded={isOpen}
+                        onClick={() => toggleTheme(theme.id)}
+                      >
+                        <span>{theme.title}</span>
+                        <span
+                          className={`writing-theme-icon ${isOpen ? 'is-open' : ''}`}
+                          aria-hidden="true"
+                        />
+                      </button>
+                      {isOpen ? <div className="writing-theme-content">{renderWritingContent(theme.content)}</div> : null}
+                    </article>
+                  );
+                })}
               </div>
             </div>
           ) : (
