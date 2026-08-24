@@ -161,6 +161,7 @@ export default function App() {
         <ShowcaseModal
           variant="product"
           title="一些想法"
+          productId={activeModal.id}
           centerX={modalCenterX}
           onClose={closeModal}
         />

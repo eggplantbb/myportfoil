@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { productModalContent } from '../content/productModals';
 import { writingThemes } from '../content/writingThemes';
+import type { ProductModalId } from '../types';
 
 const wechatId = 'eggplant_bb';
 
@@ -53,6 +55,7 @@ const renderWritingContent = (content: string) =>
 type ShowcaseModalProps = {
   title: string;
   variant: 'qr' | 'product';
+  productId?: ProductModalId;
   imageSrc?: string;
   centerX?: number | null;
   onClose: () => void;
@@ -61,6 +64,7 @@ type ShowcaseModalProps = {
 export function ShowcaseModal({
   title,
   variant,
+  productId,
   imageSrc,
   centerX,
   onClose,
@@ -113,6 +117,8 @@ export function ShowcaseModal({
           transform: 'translate(-50%, -50%)',
         };
 
+  const showWritingThemes = variant === 'product' && (productId == null || productId === 'write');
+
   return (
     <div className="modal-backdrop" role="presentation" onClick={onClose}>
       <section
@@ -127,7 +133,7 @@ export function ShowcaseModal({
           <img src="/assets/close.webp" alt="" aria-hidden="true" />
         </button>
         <div className="showcase-modal-body">
-          {variant === 'product' ? (
+          {showWritingThemes ? (
             <div className="product-modal-content writing-themes-content">
               <h2>一些想法</h2>
               <div className="writing-themes-list">
@@ -153,6 +159,38 @@ export function ShowcaseModal({
                   );
                 })}
               </div>
+            </div>
+          ) : variant === 'product' ? (
+            <div className="product-modal-content">
+              {(() => {
+                const content = productModalContent[productId!];
+
+                return (
+                  <>
+                    <h2>{content.title}</h2>
+                    <div className="product-modal-media">
+                      {content.imageSrc ? (
+                        <img className="product-modal-image" src={content.imageSrc} alt={content.title} />
+                      ) : (
+                        <div className="product-modal-image-placeholder">暂无图片</div>
+                      )}
+                    </div>
+                    <p>{content.body}</p>
+                    <div className="product-modal-link-slot">
+                      {content.linkHref && content.linkText ? (
+                        <a
+                          className="product-modal-link"
+                          href={content.linkHref}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {content.linkText}
+                        </a>
+                      ) : null}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           ) : (
             <>

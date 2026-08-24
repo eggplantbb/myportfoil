@@ -1051,7 +1051,7 @@ button {
 .product-modal-content p {
   margin: 0;
   width: 100%;
-  max-width: 484px;
+  max-width: none;
   height: 78px;
   font-size: 16px;
   line-height: 1.6;
