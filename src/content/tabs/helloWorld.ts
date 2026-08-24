@@ -17,7 +17,7 @@ export const helloWorldTab: TabDefinition = {
     // 左侧工牌，hover 时左右晃动
     {
       id: 'badge-left',
-      imageSrc: '/assets/tiezhi/1-card.png',
+      imageSrc: '/assets/tiezhi/1-card.webp',
       x: -50,
       y: 5,
       width: 224,
@@ -29,7 +29,7 @@ export const helloWorldTab: TabDefinition = {
     // 左侧机票
     {
       id: 'profile-card',
-      imageSrc: '/assets/tiezhi/1-ticket.png',
+      imageSrc: '/assets/tiezhi/1-ticket.webp',
       x: 120,
       y: 33,
       width: 279,
@@ -42,7 +42,7 @@ export const helloWorldTab: TabDefinition = {
     //浙大校徽
     {
       id: 'xiaohuiZJU',
-      imageSrc: '/assets/tiezhi/1-ZJU.png',
+      imageSrc: '/assets/tiezhi/1-ZJU.webp',
       x: 250,
       y: 400,
       width: 100,
@@ -54,7 +54,7 @@ export const helloWorldTab: TabDefinition = {
     //公司logo
     {
       id: 'group',
-      imageSrc: '/assets/tiezhi/1-group.png',
+      imageSrc: '/assets/tiezhi/1-group.webp',
       x: 40,
       y: 700,
       width: 100,
@@ -66,7 +66,7 @@ export const helloWorldTab: TabDefinition = {
     // 微信贴纸，点击后打开二维码弹窗
     {
       id: 'wechat',
-      imageSrc: '/assets/tiezhi/1-wechat.png',
+      imageSrc: '/assets/tiezhi/1-wechat.webp',
       x: 251,
       y: 670,
       width: 72,
@@ -80,7 +80,7 @@ export const helloWorldTab: TabDefinition = {
     // 我的名字
     {
       id:'myname' ,
-      imageSrc: '/assets/tiezhi/1-name.png',
+      imageSrc: '/assets/tiezhi/1-name.webp',
       x: 423,
       y: 280,
       width: 300,
@@ -101,7 +101,7 @@ export const helloWorldTab: TabDefinition = {
     // 右上项目卡片
     {
       id: 'project-cover-1',
-      imageSrc: '/assets/tiezhi/1-ux.png',
+      imageSrc: '/assets/tiezhi/1-ux.webp',
       x: 742,
       y: 45,
       width: 500,
@@ -113,7 +113,7 @@ export const helloWorldTab: TabDefinition = {
     // 右下木板项目
     {
       id: 'project-cover-2',
-      imageSrc: '/assets/tiezhi/1-photos.png',
+      imageSrc: '/assets/tiezhi/1-photos.webp',
       x: 900,
       y: 286,
       width: 360,
@@ -125,7 +125,7 @@ export const helloWorldTab: TabDefinition = {
     // 左下终端风贴纸
     {
       id: 'terminal-card',
-      imageSrc: '/assets/tiezhi/1-terminal.png',
+      imageSrc: '/assets/tiezhi/1-terminal.webp',
       x: 36,
       y: 520,
       width: 300,

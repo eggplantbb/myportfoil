@@ -9,7 +9,7 @@ export const aiTab: TabDefinition = {
     {
       id: 'hkbAI',
       title: 'hkbAI',
-      imageSrc: '/assets/tiezhi/3-hkbAI.png',
+      imageSrc: '/assets/tiezhi/3-hkbAI.webp',
       x: 30,
       y: 160,
       width: 340,
@@ -21,7 +21,7 @@ export const aiTab: TabDefinition = {
     {
       id: 'bank',
       title: 'bank',
-      imageSrc: '/assets/tiezhi/3-bank.png',
+      imageSrc: '/assets/tiezhi/3-bank.webp',
       x: 40,
       y: 480,
       width: 340,
@@ -33,7 +33,7 @@ export const aiTab: TabDefinition = {
     {
       id: 'codex',
       title: 'codex',
-      imageSrc: '/assets/tiezhi/3-codex.png',
+      imageSrc: '/assets/tiezhi/3-codex.webp',
       x: 460,
       y: 195,
       width: 340,
@@ -45,7 +45,7 @@ export const aiTab: TabDefinition = {
     {
       id: 'book',
       title: 'book',
-      imageSrc: '/assets/tiezhi/3-book.png',
+      imageSrc: '/assets/tiezhi/3-book.webp',
       x: 460,
       y: 340,
       width: 340,
@@ -57,7 +57,7 @@ export const aiTab: TabDefinition = {
     {
       id: 'map',
       title: 'map',
-      imageSrc: '/assets/tiezhi/3-map.png',
+      imageSrc: '/assets/tiezhi/3-map.webp',
       x: 460,
       y: 565,
       width: 340,
@@ -69,7 +69,7 @@ export const aiTab: TabDefinition = {
     {
       id: 'jinyong',
       title: 'jinyong',
-      imageSrc: '/assets/tiezhi/3-jinyong.png',
+      imageSrc: '/assets/tiezhi/3-jinyong.webp',
       x: 900,
       y: 190,
       width: 320,
@@ -81,7 +81,7 @@ export const aiTab: TabDefinition = {
     {
       id: 'write',
       title: 'write',
-      imageSrc: '/assets/tiezhi/3-write.png',
+      imageSrc: '/assets/tiezhi/3-write.webp',
       x: 880,
       y: 460,
       width: 320,
@@ -93,7 +93,7 @@ export const aiTab: TabDefinition = {
     {
       id: 'interest',
       title: 'interest',
-      imageSrc: '/assets/tiezhi/interest.png',
+      imageSrc: '/assets/tiezhi/interest.webp',
       x: 400,
       y: 80,
       width: 500,

@@ -28,7 +28,7 @@ export function ImmersiveProjectView({
     >
       <header className="immersive-header">
         <button type="button" className="detail-back" onClick={onClose}>
-          <img src="/assets/back.png" alt="" aria-hidden="true" />
+          <img src="/assets/back.webp" alt="" aria-hidden="true" />
           <span>返回</span>
         </button>
       </header>

@@ -9,7 +9,7 @@ export const designTab: TabDefinition = {
     // 回款宝介绍
     {
       id: 'huikuanbao-card',
-      imageSrc: '/assets/tiezhi/2-hkb.png',
+      imageSrc: '/assets/tiezhi/2-hkb.webp',
       x: 180,
       y: 33,
       width: 420,
@@ -23,7 +23,7 @@ export const designTab: TabDefinition = {
     // 回款宝老板贴图
     {
       id: 'huikuanbao-boss',
-      imageSrc: '/assets/tiezhi/2-boss.png',
+      imageSrc: '/assets/tiezhi/2-boss.webp',
       x: 520,
       y: 10,
       width: 85,
@@ -35,7 +35,7 @@ export const designTab: TabDefinition = {
     // 回款宝财务
     {
       id: 'huikuanbao-caiwu',
-      imageSrc: '/assets/tiezhi/2-caiwu.png',
+      imageSrc: '/assets/tiezhi/2-caiwu.webp',
       x: 0,
       y: 40,
       width: 200,
@@ -47,7 +47,7 @@ export const designTab: TabDefinition = {
     // 回款宝发票贴图
     {
       id: 'huikuanbao-bill',
-      imageSrc: '/assets/tiezhi/2-bill.png',
+      imageSrc: '/assets/tiezhi/2-bill.webp',
       x: 140,
       y: 280,
       width: 80,
@@ -59,7 +59,7 @@ export const designTab: TabDefinition = {
     // 他行转入卡片
     {
       id: 'thzr-card',
-      imageSrc: '/assets/tiezhi/2-zr.png',
+      imageSrc: '/assets/tiezhi/2-zr.webp',
       x: 60,
       y: 440,
       width: 520,
@@ -72,7 +72,7 @@ export const designTab: TabDefinition = {
     // 他行转入配图
     {
       id: 'thzr-photo',
-      imageSrc: '/assets/tiezhi/2-heiban.png',
+      imageSrc: '/assets/tiezhi/2-heiban.webp',
       x: 480,
       y: 460,
       width: 100,
@@ -84,7 +84,7 @@ export const designTab: TabDefinition = {
     // 门店装修卡片
     {
       id: 'mdzx-card',
-      imageSrc: '/assets/tiezhi/2-mdzx.png',
+      imageSrc: '/assets/tiezhi/2-mdzx.webp',
       x: 700,
       y: 10,
       width: 400,
@@ -97,7 +97,7 @@ export const designTab: TabDefinition = {
     // 宜家
     {
       id: 'yijia',
-      imageSrc: '/assets/tiezhi/2-IKEA.png',
+      imageSrc: '/assets/tiezhi/2-IKEA.webp',
       x: 1040,
       y: 100,
       width: 80,
@@ -109,7 +109,7 @@ export const designTab: TabDefinition = {
     // 点评截图
     {
       id: 'dianping',
-      imageSrc: '/assets/tiezhi/2-dianping.png',
+      imageSrc: '/assets/tiezhi/2-dianping.webp',
       x: 1060,
       y: 160,
       width: 80,
@@ -121,7 +121,7 @@ export const designTab: TabDefinition = {
     // 农村金融调研
     {
       id: 'nc-card',
-      imageSrc: '/assets/tiezhi/2-nc.png',
+      imageSrc: '/assets/tiezhi/2-nc.webp',
       x: 680,
       y: 350,
       width: 440,
@@ -134,7 +134,7 @@ export const designTab: TabDefinition = {
     //种柑橘
     {
       id: 'nc-ganju',
-      imageSrc: '/assets/tiezhi/2-nongcun.png',
+      imageSrc: '/assets/tiezhi/2-nongcun.webp',
       x: 1080,
       y: 550,
       width: 180,
@@ -146,7 +146,7 @@ export const designTab: TabDefinition = {
     // 老头
     {
       id: 'nc-laotou',
-      imageSrc: '/assets/tiezhi/2-laotou.png',
+      imageSrc: '/assets/tiezhi/2-laotou.webp',
       x: 1050,
       y: 480,
       width: 120,
@@ -158,7 +158,7 @@ export const designTab: TabDefinition = {
     // 辣椒
     {
       id: 'nc-lajiao',
-      imageSrc: '/assets/tiezhi/2-lajiao.png',
+      imageSrc: '/assets/tiezhi/2-lajiao.webp',
       x: 700,
       y: 700,
       width: 120,

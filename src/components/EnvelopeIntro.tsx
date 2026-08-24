@@ -145,9 +145,9 @@ export function EnvelopeIntro({ onComplete }: EnvelopeIntroProps) {
         aria-label="打开信封"
         disabled={state !== 'closed'}
       />
-      <img className="envelope-image envelope-image-closed" src="/assets/intro/envelope-closed.png" alt="闭合的信封" />
+      <img className="envelope-image envelope-image-closed" src="/assets/intro/envelope-closed.webp" alt="闭合的信封" />
       <div className="envelope-revealed-booklet">
-        <img className="envelope-image envelope-image-open" src="/assets/intro/envelope-open.png" alt="打开的信封" />
+        <img className="envelope-image envelope-image-open" src="/assets/intro/envelope-open.webp" alt="打开的信封" />
         <button
           type="button"
           className={`envelope-booklet-card ${isDragging ? 'is-dragging' : ''}`}
@@ -159,9 +159,9 @@ export function EnvelopeIntro({ onComplete }: EnvelopeIntroProps) {
           aria-label="向上拖出小册子"
           disabled={state !== 'revealed'}
         >
-          <img src="/assets/intro/booklet-home.png" alt="小册子首页预览" />
+          <img src="/assets/intro/booklet-home.webp" alt="小册子首页预览" />
         </button>
-        <img className="envelope-image envelope-image-front" src="/assets/intro/envelope-front.png" alt="" aria-hidden="true" />
+        <img className="envelope-image envelope-image-front" src="/assets/intro/envelope-front.webp" alt="" aria-hidden="true" />
       </div>
     </main>
   );

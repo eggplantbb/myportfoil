@@ -138,7 +138,7 @@ export default function App() {
           <div className="home-booklet" style={{ transform: `scale(${homeScale})` }}>
             <div className="booklet-header">
               <TabBar tabs={tabs} activeTabId={activeTabId} onChange={setActiveTabId} />
-              <img className="booklet-credit" src="/assets/footer-made-by.png" alt="made by ChatGPT x Figma" />
+              <img className="booklet-credit" src="/assets/footer-made-by.webp" alt="made by ChatGPT x Figma" />
             </div>
             <main className="main-stage">
               <CollageCanvas key={activeTab.id} tab={activeTab} onItemClick={handleItemClick} />

@@ -8,7 +8,7 @@ export const travelTab: TabDefinition = {
   items: [
     {
       id: '5-1',
-      imageSrc: '/assets/tiezhi/5-1.png',
+      imageSrc: '/assets/tiezhi/5-1.webp',
       x: 34,
       y: 60,
       width: 204,
@@ -19,7 +19,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-2',
-      imageSrc: '/assets/tiezhi/5-2.png',
+      imageSrc: '/assets/tiezhi/5-2.webp',
       x: 280,
       y: 30,
       width: 180,
@@ -29,7 +29,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-3',
-      imageSrc: '/assets/tiezhi/5-3.png',
+      imageSrc: '/assets/tiezhi/5-3.webp',
       x: 1000,
       y: 550,
       width: 160,
@@ -39,7 +39,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-4',
-      imageSrc: '/assets/tiezhi/5-4.png',
+      imageSrc: '/assets/tiezhi/5-4.webp',
       x: 820,
       y: 28,
       width: 204,
@@ -50,7 +50,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-5',
-      imageSrc: '/assets/tiezhi/5-5.png',
+      imageSrc: '/assets/tiezhi/5-5.webp',
       x: 1060,
       y: 60,
       width: 140,
@@ -60,7 +60,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-8',
-      imageSrc: '/assets/tiezhi/5-8.png',
+      imageSrc: '/assets/tiezhi/5-8.webp',
       x: 426,
       y: 298,
       width: 176,
@@ -71,7 +71,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-9',
-      imageSrc: '/assets/tiezhi/5-9.png',
+      imageSrc: '/assets/tiezhi/5-9.webp',
       x: 530,
       y: 44,
       width: 250,
@@ -82,7 +82,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-11',
-      imageSrc: '/assets/tiezhi/5-11.png',
+      imageSrc: '/assets/tiezhi/5-11.webp',
       x: 990,
       y: 360,
       width: 220,
@@ -92,7 +92,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-12',
-      imageSrc: '/assets/tiezhi/5-12.png',
+      imageSrc: '/assets/tiezhi/5-12.webp',
       x: 80,
       y: 310,
       width: 230,
@@ -102,7 +102,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-13',
-      imageSrc: '/assets/tiezhi/5-13.png',
+      imageSrc: '/assets/tiezhi/5-13.webp',
       x: 124,
       y: 530,
       width: 250,
@@ -113,7 +113,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-14',
-      imageSrc: '/assets/tiezhi/5-14.png',
+      imageSrc: '/assets/tiezhi/5-14.webp',
       x: 450,
       y: 580,
       width: 200,
@@ -124,7 +124,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-15',
-      imageSrc: '/assets/tiezhi/5-15.png',
+      imageSrc: '/assets/tiezhi/5-15.webp',
       x: 660,
       y: 330,
       width: 240,
@@ -135,7 +135,7 @@ export const travelTab: TabDefinition = {
     },
     {
       id: '5-16',
-      imageSrc: '/assets/tiezhi/5-16.png',
+      imageSrc: '/assets/tiezhi/5-16.webp',
       x: 730,
       y: 600,
       width: 220,

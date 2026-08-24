@@ -124,7 +124,7 @@ export function ShowcaseModal({
         onClick={(event) => event.stopPropagation()}
       >
         <button type="button" className="showcase-modal-close" onClick={onClose} aria-label="关闭弹窗">
-          <img src="/assets/close.png" alt="" aria-hidden="true" />
+          <img src="/assets/close.webp" alt="" aria-hidden="true" />
         </button>
         <div className="showcase-modal-body">
           {variant === 'product' ? (

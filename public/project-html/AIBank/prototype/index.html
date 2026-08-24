@@ -3178,7 +3178,7 @@ body.intro-on { overflow: hidden; }
 <div class="intro-page" id="introPage">
   <div class="intro-inner">
     <div class="intro-visual-wrap">
-      <img class="intro-visual" id="introVisual" src="intro-shots/no1.png" alt="">
+      <img class="intro-visual" id="introVisual" src="intro-shots/no1.webp" alt="">
     </div>
     <div class="intro-controls">
       <button class="intro-arrow" id="introPrevBtn" type="button" aria-label="上一张">‹</button>
@@ -3201,7 +3201,7 @@ body.intro-on { overflow: hidden; }
 <div class="legacy-phone">
   <div class="prototype-title">现有的手机银行</div>
   <div class="legacy-screen">
-    <img class="legacy-shot" id="legacyShot" src="legacy-shots/shouye.png" alt="">
+    <img class="legacy-shot" id="legacyShot" src="legacy-shots/shouye.webp" alt="">
   </div>
   <img class="phone-shell" src="../phone.png" alt="">
 </div>
@@ -4106,7 +4106,7 @@ document.addEventListener('click', event => {
   const prevBtn = document.getElementById('introPrevBtn');
   const nextBtn = document.getElementById('introNextBtn');
   const dots = Array.from(document.querySelectorAll('.intro-dot'));
-  const slides = ['intro-shots/no1.png', 'intro-shots/no2.png', 'intro-shots/no3.png', 'intro-shots/no4.png'];
+  const slides = ['intro-shots/no1.webp', 'intro-shots/no2.webp', 'intro-shots/no3.webp', 'intro-shots/no4.webp'];
   let index = 0;
 
   if (!introBtn || !introPage) return;
@@ -4330,13 +4330,13 @@ function toggleCollections(btn) {
 }
 
 const LEGACY_PAGES = {
-  home: 'legacy-shots/shouye.png',
-  receivable: 'legacy-shots/chahuikuan.png',
-  payment: 'legacy-shots/yuefukuan.png',
-  salary: 'legacy-shots/kangongzi.png',
-  cash: 'legacy-shots/fangxianqian.png',
-  analysis: 'legacy-shots/no.png',
-  stockup: 'legacy-shots/no.png'
+  home: 'legacy-shots/shouye.webp',
+  receivable: 'legacy-shots/chahuikuan.webp',
+  payment: 'legacy-shots/yuefukuan.webp',
+  salary: 'legacy-shots/kangongzi.webp',
+  cash: 'legacy-shots/fangxianqian.webp',
+  analysis: 'legacy-shots/no.webp',
+  stockup: 'legacy-shots/no.webp'
 };
 
 function renderLegacyPage(key) {
